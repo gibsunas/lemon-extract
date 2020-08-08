@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/index.js",
   "bin": {
-    "@lemon/extract": "bin/extract"
+    "@lemon/extract": "bin/extract.js"
   },
   "scripts": {
     "run": "@lemon/extract",
