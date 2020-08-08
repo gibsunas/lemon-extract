@@ -1,0 +1,20 @@
+{
+  "name": "@lemon/extract",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "bin": {
+    "@lemon/extract": "bin/extract"
+  },
+  "scripts": {
+    "run": "@lemon/extract",
+    "patch-release": "npm version patch && npm publish && git push --follow-tags",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "James Gibson",
+  "license": "MIT",
+  "dependencies": {
+    "cli-table": "^0.3.1",
+    "glob": "^7.1.6"
+  }
+}
