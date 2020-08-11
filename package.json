@@ -1,6 +1,6 @@
 {
   "name": "@lemon/extract",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "main": "lib/index.ts",
   "bin": {
@@ -10,7 +10,7 @@
     "node": ">=12",
     "typescript": ">=3"
   },
-  "engineStrict" : true,
+  "engineStrict": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "run": "mkdir -p dist && npm run build && node bin/extract.js  ",
