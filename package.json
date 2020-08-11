@@ -12,7 +12,7 @@
   },
   "engineStrict": true,
   "scripts": {
-    "build": "mkdir -p dist/bin && cp bin/extract.js dist/bin/extract.js && tsc -b",
+    "build": "mkdir -p dist && tsc -b && mkdir -p dist/bin && cp bin/extract.js dist/bin/extract.js",
     "run": "npm run build && node bin/extract.js  ",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "patch": "npm version patch && npm run build && cd dist/ && ts-node ../scripts/publishing/prepare.ts && npm publish --dry-run",
