@@ -5,10 +5,10 @@
         "rootDir": "lib/",
         "tsBuildInfoFile": ".tsbuildinfo",
         "types": [ "node"],
-        "outDir": "dist"
+        "outDir": "dist/"
     },
     "include": [
-        "./lib/**/*",
+        "lib/**/*",
     ],
     "exclude": [
         "node_modules"

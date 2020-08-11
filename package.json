@@ -1,6 +1,6 @@
 {
   "name": "@lemon/extract",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "",
   "main": "lib/index.ts",
   "bin": {
@@ -12,8 +12,8 @@
   },
   "engineStrict": true,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "run": "mkdir -p dist && npm run build && node bin/extract.js  ",
+    "build": "mkdir -p dist && tsc -b",
+    "run": "npm run build && node bin/extract.js  ",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "patch": "npm version patch && npm run build && cd dist/ && ts-node ../scripts/publishing/prepare.ts && npm publish --dry-run",
     "test": "echo \"Error: no test specified\" && exit 1"
