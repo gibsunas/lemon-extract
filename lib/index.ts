@@ -32,7 +32,9 @@ glob("**/tsconfig*.json", function (er, files) {
     //console.log(files);
 
     const uniqueConfigTypes = files
+      .filter((file) => !file.includes('node_modules'))
       .map(file => {
+        console.log(file);
         return file.split('/').pop();
       }).reduce((acc,x) => {
         const result = { ...acc };
