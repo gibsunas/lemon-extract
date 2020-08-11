@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "composite": true,
+        "target": "ESNext",
+        "rootDir": "lib/",
+        "tsBuildInfoFile": ".tsbuildinfo",
+        "types": [ "node"],
+        "outDir": "dist"
+    },
+    "include": [
+        "./lib/**/*",
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

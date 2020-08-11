@@ -2,6 +2,7 @@ const glob = require('glob');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const prettyBytes = require('pretty-bytes');
 
 const transformToTable = (metadata) => {
   // console.log(metadata.stats)
@@ -76,7 +77,7 @@ glob("**/tsconfig*.json", function (er, files) {
       .map(transformToTable)
       .map((entry) => {
         
-      table.push({ [entry.title]: [entry.fileCount,entry.size, entry.errors] } )
+      table.push({ [entry.title]: [entry.fileCount,prettyBytes(entry.size), entry.errors] } )
     }) 
      
     console.log(table.toString());
