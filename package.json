@@ -18,7 +18,8 @@
     "build": "mkdir -p dist && tsc -b",
     "run": "npm run build && node bin/extract.js  ",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
-    "patch": "npm run clean && npm version patch && npm run release:prepare && cd dist/ && npm publish --dry-run",
+    "patch": "npm run clean && npm version patch && npm run release:prepare && cd dist/ && npm publish",
+    "patch:dry": "npm run patch  --dry-run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": false,
