@@ -1,6 +1,6 @@
 {
   "name": "@lemon/extract",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -14,7 +14,7 @@
   "scripts": {
     "clean": "rm -rf dist/",
     "release:build": "mkdir -p dist/bin && tsc -b --clean && tsc -b --force && mkdir -p dist/bin && cp bin/extract.js dist/bin/extract.js",
-    "release:prepare" : "npm run release:build && cd dist/ && ts-node ../scripts/publishing/prepare.ts",
+    "release:prepare": "npm run release:build && cd dist/ && ts-node ../scripts/publishing/prepare.ts",
     "build": "mkdir -p dist && tsc -b",
     "run": "npm run build && node bin/extract.js  ",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
