@@ -14,11 +14,11 @@
   "scripts": {
     "clean": "rm -rf dist/",
     "release:build": "mkdir -p dist/bin && tsc -b --clean && tsc -b --force && mkdir -p dist/bin && cp bin/extract.js dist/bin/extract.js",
-    "release:prepare": "npm run release:build && cd dist/ && ts-node ../scripts/publishing/prepare.ts",
+    "release:prepare": "npm run clean && npm run release:build && cd dist/ && ts-node ../scripts/publishing/prepare.ts",
     "build": "mkdir -p dist && tsc -b",
     "run": "npm run build && node bin/extract.js  ",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
-    "patch": "npm run clean && npm version patch && npm run release:prepare && cd dist/ && npm publish",
+    "patch": "npm version patch && npm run release:prepare && cd dist/ && npm publish",
     "patch:dry": "npm run clean && npm version patch && npm run release:prepare && cd dist/ && npm publish --dry-run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
