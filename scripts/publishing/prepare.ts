@@ -18,7 +18,7 @@ function main() {
     fs.writeFileSync(rootDir + "/dist/package.json", Buffer.from(JSON.stringify(sourceObj, null, 2), "utf-8") );
     fs.writeFileSync(rootDir + "/dist/version.txt", Buffer.from(sourceObj.version, "utf-8") );
 
-    fs.copyFileSync(rootDir + "/.npmignore", "dist/.npmignore");
+    fs.copyFileSync(rootDir + "/.npmignore", rootDir + "/dist/.npmignore");
 }
 
 main();
