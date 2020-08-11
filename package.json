@@ -6,10 +6,16 @@
   "bin": {
     "@lemon/extract": "bin/extract.js"
   },
+  "engines": {
+    "node": ">=12",
+    "typescript": ">=3"
+  },
+  "engineStrict" : true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "run": "npm run build && node bin/extract.js  ",
+    "run": "mkdir -p dist && npm run build && node bin/extract.js  ",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
+    "patch": "npm version patch && npm run build && cd dist/ && ts-node ../scripts/publishing/prepare.ts && npm publish --dry-run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": false,
@@ -21,6 +27,7 @@
     "pretty-bytes": "^5.3.0"
   },
   "devDependencies": {
-    "@types/node": "^14.0.27"
+    "@types/node": "^14.0.27",
+    "ts-node": "^8.10.2"
   }
 }
