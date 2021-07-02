@@ -2,7 +2,8 @@
   "name": "@lemon/extract",
   "version": "0.0.19",
   "description": "",
-  "main": "index.js",
+  "es": "bin/extract.js",
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "git@github.com:gibsunas/lemon-extract.git"
@@ -16,11 +17,13 @@
   },
   "engineStrict": true,
   "scripts": {
+    "nodemon": "nodemon -e .js -w dist --exec 'webpack && bin/extract.js'",
+    "webpack": "webpack",
     "clean": "rm -rf dist/",
     "release:build": "mkdir -p dist/bin && tsc -b --clean && tsc -b --force && mkdir -p dist/bin && cp bin/extract.js dist/bin/extract.js",
     "release:prepare": "npm run clean && npm run release:build && cd dist/ && ts-node ../scripts/publishing/prepare.ts",
     "build": "mkdir -p dist && tsc -b",
-    "run": "npm run build && node bin/extract-local.js  ",
+    "run": "npm run webpack && bash bin/extract",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "patch": "npm version patch && npm run release:prepare && cd dist/ && npm publish",
     "patch:dry": "npm run clean && npm version patch && npm run release:prepare && cd dist/ && npm publish --dry-run",
@@ -30,13 +33,21 @@
   "author": "James Gibson",
   "license": "MIT",
   "dependencies": {
+    "@angular-devkit/schematics": "^11.2.6",
+    "@nrwl/workspace": "^11.5.2",
     "cli-table": "^0.3.1",
+    "commander": "^2.20.3",
     "glob": "^7.1.6",
     "pretty-bytes": "^5.3.0"
   },
   "devDependencies": {
     "@types/node": "^14.0.27",
+    "nodemon": "^2.0.7",
+    "ts-loader": "^8.0.18",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "webpack": "^5.27.2",
+    "webpack-cli": "^4.5.0",
+    "webpack-node-externals": "2.5.2"
   }
 }

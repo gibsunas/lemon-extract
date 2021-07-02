@@ -1,3 +1,2 @@
 #! /usr/bin/env node
-const main = require('../index.js');
-
+const cli = require('../dist/bundle.js');
