@@ -19,6 +19,7 @@ function main() {
     fs.writeFileSync(rootDir + "/dist/version.txt", Buffer.from(sourceObj.version, "utf-8") );
 
     fs.copyFileSync(rootDir + "/.npmignore", rootDir + "/dist/.npmignore");
+    fs.copyFileSync(rootDir + "/readme.md", rootDir + "/dist/readme.md");
 }
 
 main();
