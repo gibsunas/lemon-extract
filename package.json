@@ -2,8 +2,8 @@
   "name": "@lemon/extract",
   "version": "0.0.19",
   "description": "",
+  "type": "module",
   "es": "bin/extract.js",
-  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "git@github.com:gibsunas/lemon-extract.git"
@@ -12,13 +12,13 @@
     "@lemon/extract": "bin/extract.js"
   },
   "engines": {
-    "node": ">=12",
-    "typescript": ">=3"
+    "node": ">=14",
+    "typescript": ">=4"
   },
   "engineStrict": true,
   "scripts": {
     "nodemon": "nodemon -e .js -w dist --exec 'webpack && bin/extract.js'",
-    "webpack": "webpack",
+    "webpack": "webpack -c webpack.config.cjs",
     "clean": "rm -rf dist/",
     "release:build": "mkdir -p dist/bin && tsc -b --clean && tsc -b --force && mkdir -p dist/bin && cp bin/extract.js dist/bin/extract.js",
     "release:prepare": "npm run clean && npm run release:build && cd dist/ && ts-node ../scripts/publishing/prepare.ts",
@@ -27,7 +27,8 @@
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "patch": "npm version patch && npm run release:prepare && cd dist/ && npm publish",
     "patch:dry": "npm run clean && npm version patch && npm run release:prepare && cd dist/ && npm publish --dry-run",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "jest",
+    "lint": "eslint"
   },
   "private": false,
   "author": "James Gibson",
@@ -37,11 +38,21 @@
     "@nrwl/workspace": "^11.5.2",
     "cli-table": "^0.3.1",
     "commander": "^2.20.3",
-    "glob": "^7.1.6",
+    "github-api": "^3.4.0",
+    "glob": "^7.1.7",
     "pretty-bytes": "^5.3.0"
   },
   "devDependencies": {
+    "@open-wc/building-rollup": "^1.10.0",
+    "@rollup/plugin-typescript": "^8.2.1",
     "@types/node": "^15.14.0",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "deepmerge": "^4.2.2",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.2",
+    "jest": "^27.2.2",
     "nodemon": "^2.0.9",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",

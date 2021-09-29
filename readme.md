@@ -2,6 +2,15 @@
 
 A utility tool designed to enable faster debugging of Typescript mono repos.
 
+## Dev
+```
+# Terminal A
+$ npm run webpack -- --watch
+
+# Terminal B
+$ DEBUG=@lemon/extract:* node ./bin/extract.js --help
+```
+
 ## Running
 
 The fastest way to utilize `@lemon/extract` is by running

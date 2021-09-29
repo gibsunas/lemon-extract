@@ -1,16 +1,18 @@
-import { existsSync, readFileSync } from 'fs';
-import glob from 'glob';
-import * as Table from 'cli-table';
+import { main as LemonExtractCore } from '@lemon/extract/core';
 import { execSync } from 'child_process';
-import fs from 'fs';
-import {dirname, resolve} from 'path';
-import prettyBytes from 'pretty-bytes';
-
-import { Nx } from './introspection/nx/index';
-
+import * as Table from 'cli-table';
 import { Command } from 'commander';
-const program = new Command();
+import path, { dirname, resolve } from 'path';
+import prettyBytes from 'pretty-bytes';
+import { Nx } from './introspection/nx/index';
+import { readPackageJson } from './utils';
+import { debug as Debug } from "./utils/debug";
 
+
+
+const fs = require("fs");
+const glob = require("glob");
+const debug = Debug.extend("cli")
 const transformToTable = (metadata) => {
   // console.log(metadata.stats)
   return {
@@ -29,16 +31,14 @@ const extractStats = (metadata) => {
     total += stats.size;
   })
 
-  return { ...metadata, stats: {total}};
+  return { ...metadata, stats: { total } };
 }
-
-const collectSchematicCollections = async ():Promise<string[]> => {
+const collectSchematicCollections = async (): Promise<string[]> => {
   return new Promise((resolve, reject) => {
     glob("**/collection.json", async (error, files) => {
       resolve(files);
     })
   })
-
 };
 
 const extract = async () => {
@@ -54,20 +54,22 @@ const extract = async () => {
     const ignoreList = schematicCollections.map(collectionPath => {
       const collectionRoot = resolve(collectionPath.replace('collection.json', ''));
       const { schematics }: { schematics: any } = JSON.parse(String(fs.readFileSync(collectionPath)));
-      const collectionSchematics:Array<any> = Object.values(schematics);
+      const collectionSchematics: Array<any> = Object.values(schematics);
       collectionSchematics.map(key => {
-        console.log(schematics,schematics[key])
+        console.log(schematics, schematics[key])
       })
-      // console.log({ schematics, collectionSchematics});
+      debug({ schematics, collectionSchematics });
 
       const dirsToIgnore = !collectionSchematics.length ? [] : collectionSchematics
+        .filter(s => s.schema)
         .map((schematic) => {
           const { schema } = schematic;
+          console.log({ collectionRoot, schema })
           const schemaPath = resolve(collectionRoot, schema);
-            const partialPath = `${schemaPath.replace('schema.json', '')}files`;
+          const partialPath = `${schemaPath.replace('schema.json', '')}files`;
 
-            const filesDir = schema.replace('schema.json', '');
-            return filesDir;
+          const filesDir = schema.replace('schema.json', '');
+          return filesDir;
         })
         .map(schematicFilesRoot => {
           return `${schematicFilesRoot}.*`.replace('/', '\/')
@@ -81,9 +83,9 @@ const extract = async () => {
     const uniqueConfigTypes = files
       .filter((file) => !file.includes('node_modules'))
       .map(file => {
-        // console.log(file);
+        debug("typescript:config")(`Found ${file}`);
         return file.split('/').pop();
-      }).reduce((acc,x) => {
+      }).reduce((acc, x) => {
         const result = { ...acc };
         result[x] = result[x] ? result[x] + 1 : 1;
         return result;
@@ -100,7 +102,8 @@ const extract = async () => {
       try {
         metadata = {
           ...metadata,
-          ...JSON.parse(String(execSync(`tsc -p ${config} --noEmit --showConfig`)))};
+          ...JSON.parse(String(execSync(`tsc -p ${config} --noEmit --showConfig`)))
+        };
       } catch (error) {
         const message = String(error.output);
         if (message.includes('TS18003')) {
@@ -120,13 +123,13 @@ const extract = async () => {
         return ignoreList
           .map(ignoreKey => {
             // console.log(resolve(`${rootPath}${x}`))
-            console.log({file,ignoreKey: ignoreKey.replace('./','.*/')})
-            return String(`${file}`).includes(ignoreKey.replace('./','.*/'))
+            console.log({ file, ignoreKey: ignoreKey.replace('./', '.*/') })
+            return String(`${file}`).includes(ignoreKey.replace('./', '.*/'))
           })
           .reduce((acc, value) => {
             return !!acc ? !!acc : !!value
           }, false)
-        })
+      })
       .map(inspectConfig)
       .filter(x => x)
       .map(extractStats)
@@ -137,8 +140,8 @@ const extract = async () => {
       .map(transformToTable)
       .map((entry) => {
 
-      table.push({ [entry.title]: [entry.fileCount,prettyBytes(entry.size), entry.errors] } )
-    })
+        table.push({ [entry.title]: [entry.fileCount, prettyBytes(entry.size), entry.errors] })
+      })
 
     console.log(table.toString());
     console.log(uniqueConfigTypes)
@@ -163,20 +166,56 @@ const context: RunContext = {
 // console.log(Nx(context))
 //console.log(introspectNx(context).warnings);
 
-program
-  .version('0.0.1')
-  .option('-c, --config <path>', 'set config path', './deploy.conf');
+const createExtractCore = async (options) => {
+  debug(`Creating LemonExtractCore`);
+  return LemonExtractCore({ processArgs: options._args })
+}
 
-// program
-//   .command('extract')
-//   .description('Typescript review')
-//   .action((options) => {
-//     extract();
-//   });
-program
-  .command('lint')
-  .description('Workspace linting')
-  .action((options) => {
-    console.log(Nx(context))
-  });
-program.parse(process.argv)
+const main = () => {
+  const packageJson = readPackageJson(path.resolve(__dirname, ".."));
+  const program = new Command();
+  program
+    .version(packageJson.version)
+  // .option('-c, --config <path>', 'set config path', './.lemon-extract.json');
+
+  program
+    .command('gh')
+    .description('Github')
+    .action((options) =>
+      createExtractCore(options)
+        .then(({ github }) => github()));
+
+  program
+    .command('projects')
+    .description('Projects')
+    .action((options) =>
+      createExtractCore(options)
+        .then(({ projects }) => projects()));
+
+  program
+    .command('ts')
+    .description('Typescript review')
+    .action((options) => {
+      debug(`Launching typescript review executor`);
+      extract();
+    });
+  program
+    .command('lint')
+    .description('Workspace linting')
+    .action((options) => {
+      debug(`Launching workspace linting`);
+      console.log(Nx(context))
+    });
+
+  program
+    .command('something')
+    .description('Something')
+    .action((options) =>
+      createExtractCore(options)
+        .then(({ something }) => something()));
+
+  program.parse(process.argv)
+};
+export const cli = main;
+export default { cli, main };
+main();

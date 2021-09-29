@@ -6,6 +6,7 @@ module.exports = {
   entry: './lib/index.ts',
   devtool: 'inline-source-map',
   target: 'node',
+  module: "CommonJS",
   mode: 'development',
   externals: [nodeExternals()],
   module: {
@@ -19,24 +20,25 @@ module.exports = {
   },
   resolve: {
     alias: {
-      '@lemon/extract/introspection':  path.resolve(__dirname, 'lib/introspection/'),
-      '@lemon/extract/utils':  path.resolve(__dirname, 'lib/utils/'),
+      '@lemon/extract/introspection': path.resolve(__dirname, 'lib/introspection/'),
+      '@lemon/extract/utils': path.resolve(__dirname, 'lib/utils/'),
+      '@lemon/extract/core': path.resolve(__dirname, 'lib/core/'),
     },
     modules: [
-        'node_modules'
+      'node_modules'
     ],
-    extensions: [ '.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js'],
     fallback: {
-        '@nrwl/workspace': false,
-        assert: false,
-        child_process: false,
-        fs: false,
-        path: false,
-        util: false,
+      '@nrwl/workspace': false,
+      assert: false,
+      child_process: false,
+      fs: false,
+      path: false,
+      util: false,
     },
   },
   output: {
-    filename: 'bundle.js',
+    filename: 'bundle.cjs',
     path: path.resolve('.', 'dist'),
   },
 };
