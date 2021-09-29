@@ -3,13 +3,13 @@
   "version": "0.2.4",
   "description": "",
   "type": "module",
-  "es": "bin/extract.js",
+  "es": "bin/cli.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:gibsunas/lemon-extract.git"
   },
   "bin": {
-    "@lemon/extract": "bin/extract.cjs"
+    "@lemon/extract": "bin/cli.cjs"
   },
   "engines": {
     "node": ">=14",
