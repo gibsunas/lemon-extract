@@ -20,7 +20,7 @@
     "nodemon": "nodemon -e .js -w dist --exec 'webpack && bin/extract.cjs'",
     "webpack": "webpack -c webpack.config.cjs",
     "clean": "rm -rf dist/",
-    "release:build": "npm run webpack && mkdir -p dist/bin && cp bin/extract.cjs dist/bin/extract.cjs",
+    "release:build": "npm run webpack && mkdir -p dist/bin && cp bin/cli.cjs dist/bin/cli.cjs && cp bin/extract.cjs dist/bin/extract.cjs",
     "release:prepare": "npm run clean && npm run release:build && cd dist/ && node ../scripts/publishing/prepare.cjs",
     "build": "npm run webpack",
     "watch": "npm run webpack --watch",
