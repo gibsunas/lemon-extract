@@ -26,6 +26,7 @@
     "run": "npm run webpack && bash bin/extract",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "patch": "npm version patch && npm run release:prepare && cd dist/ && npm publish",
+    "minor": "npm version minor && npm run release:prepare && cd dist/ && npm publish",
     "patch:dry": "npm run clean && npm version patch && npm run release:prepare && cd dist/ && npm publish --dry-run",
     "test": "jest",
     "lint": "eslint"
