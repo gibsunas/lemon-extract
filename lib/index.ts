@@ -1,9 +1,6 @@
 import { main as LemonExtractCore } from '@lemon/extract/core';
-import { execSync } from 'child_process';
-import * as Table from 'cli-table';
 import { Command } from 'commander';
-import path, { dirname, resolve } from 'path';
-import prettyBytes from 'pretty-bytes';
+import path from 'path';
 import { debug as Debug } from './utils/debug';
 // import { Nx } from './introspection/nx/index';
 import { readPackageJson } from './utils/index';
@@ -11,124 +8,124 @@ import { readPackageJson } from './utils/index';
 const fs = require('fs');
 const glob = require('glob');
 
-const debug = Debug.extend('cli');
-const transformToTable = (metadata) =>
-// console.log(metadata.stats)
-({
-    title: metadata.configPath,
-    fileCount: metadata.files ? metadata.files.length : 0,
-    size: metadata.stats.total,
-    errors: metadata.errors.join(', '),
-});
-const extractStats = (metadata) => {
-    let total = 0;
-    const files = metadata.files || [];
-    files.map((file) => {
-        const stats = fs.statSync(resolve(metadata.rootDir, file));
-        total += stats.size;
-    });
+const debug = Debug();
+// const transformToTable = (metadata) =>
+// // console.log(metadata.stats)
+// ({
+//     title: metadata.configPath,
+//     fileCount: metadata.files ? metadata.files.length : 0,
+//     size: metadata.stats.total,
+//     errors: metadata.errors.join(', '),
+// });
+// const extractStats = (metadata) => {
+//     let total = 0;
+//     const files = metadata.files || [];
+//     files.map((file) => {
+//         const stats = fs.statSync(resolve(metadata.rootDir, file));
+//         total += stats.size;
+//     });
 
-    return { ...metadata, stats: { total } };
-};
-const collectSchematicCollections = async (): Promise<string[]> => new Promise((resolve, reject) => {
-    glob('**/collection.json', async (error, files) => {
-        resolve(files);
-    });
-});
+//     return { ...metadata, stats: { total } };
+// };
+// const collectSchematicCollections = async (): Promise<string[]> => new Promise((resolve, reject) => {
+//     glob('**/collection.json', async (error, files) => {
+//         resolve(files);
+//     });
+// });
 
-const extract = async () => {
-    glob('**/tsconfig*.json', async (er, files) => {
-        const rootPath = process.cwd();
-        // files is an array of filenames.
-        // If the `nonull` option is set, and nothing
-        // was found, then files is ["**/*.js"]
-        // er is an error object or null.
-        // console.log(files);
-        const schematicCollections = await collectSchematicCollections();
-        // console.log(schematicCollections)
-        const ignoreList = schematicCollections.map((collectionPath) => {
-            const collectionRoot = resolve(collectionPath.replace('collection.json', ''));
-            const { schematics }: { schematics: any } = JSON.parse(String(fs.readFileSync(collectionPath)));
-            const collectionSchematics: Array<any> = Object.values(schematics);
-            collectionSchematics.map((key) => {
-                console.log(schematics, schematics[key]);
-            });
-            debug({ schematics, collectionSchematics });
+// const extract = async () => {
+//     glob('**/tsconfig*.json', async (er, files) => {
+//         const rootPath = process.cwd();
+//         // files is an array of filenames.
+//         // If the `nonull` option is set, and nothing
+//         // was found, then files is ["**/*.js"]
+//         // er is an error object or null.
+//         // console.log(files);
+//         const schematicCollections = await collectSchematicCollections();
+//         // console.log(schematicCollections)
+//         const ignoreList = schematicCollections.map((collectionPath) => {
+//             const collectionRoot = resolve(collectionPath.replace('collection.json', ''));
+//             const { schematics }: { schematics: any } = JSON.parse(String(fs.readFileSync(collectionPath)));
+//             const collectionSchematics: Array<any> = Object.values(schematics);
+//             collectionSchematics.map((key) => {
+//                 console.log(schematics, schematics[key]);
+//             });
+//             debug({ schematics, collectionSchematics });
 
-            const dirsToIgnore = !collectionSchematics.length ? [] : collectionSchematics
-                .filter((s) => s.schema)
-                .map((schematic) => {
-                    const { schema } = schematic;
-                    console.log({ collectionRoot, schema });
-                    const schemaPath = resolve(collectionRoot, schema);
-                    const partialPath = `${schemaPath.replace('schema.json', '')}files`;
+//             const dirsToIgnore = !collectionSchematics.length ? [] : collectionSchematics
+//                 .filter((s) => s.schema)
+//                 .map((schematic) => {
+//                     const { schema } = schematic;
+//                     console.log({ collectionRoot, schema });
+//                     const schemaPath = resolve(collectionRoot, schema);
+//                     const partialPath = `${schemaPath.replace('schema.json', '')}files`;
 
-                    const filesDir = schema.replace('schema.json', '');
-                    return filesDir;
-                })
-                .map((schematicFilesRoot) => `${schematicFilesRoot}.*`.replace('/', '\/'))
-                .flat();
+//                     const filesDir = schema.replace('schema.json', '');
+//                     return filesDir;
+//                 })
+//                 .map((schematicFilesRoot) => `${schematicFilesRoot}.*`.replace('/', '\/'))
+//                 .flat();
 
-            return dirsToIgnore;
-        }).flat();
+//             return dirsToIgnore;
+//         }).flat();
 
-        console.log(ignoreList);
-        const uniqueConfigTypes = files
-            .filter((file) => !file.includes('node_modules'))
-            .map((file) => {
-                debug('typescript:config')(`Found ${file}`);
-                return file.split('/').pop();
-            }).reduce((acc, x) => {
-                const result = { ...acc };
-                result[x] = result[x] ? result[x] + 1 : 1;
-                return result;
-            }, {});
+//         console.log(ignoreList);
+//         const uniqueConfigTypes = files
+//             .filter((file) => !file.includes('node_modules'))
+//             .map((file) => {
+//                 debug('typescript:config')(`Found ${file}`);
+//                 return file.split('/').pop();
+//             }).reduce((acc, x) => {
+//                 const result = { ...acc };
+//                 result[x] = result[x] ? result[x] + 1 : 1;
+//                 return result;
+//             }, {});
 
-        const inspectConfig = (config) => {
-            let metadata = {
-                configPath: config,
-                errors: [],
-                rootDir: dirname(config),
-            };
-            try {
-                metadata = {
-                    ...metadata,
-                    ...JSON.parse(String(execSync(`tsc -p ${config} --noEmit --showConfig`))),
-                };
-            } catch (error) {
-                const message = String(error.output);
-                if (message.includes('TS18003')) {
-                    metadata.errors.push('TS18003');
-                } else {
-                    console.error(`Unhandled error:\n\n${message}\n\n${metadata.configPath}`);
-                }
-            }
-            return metadata;
-        };
+//         const inspectConfig = (config) => {
+//             let metadata = {
+//                 configPath: config,
+//                 errors: [],
+//                 rootDir: dirname(config),
+//             };
+//             try {
+//                 metadata = {
+//                     ...metadata,
+//                     ...JSON.parse(String(execSync(`tsc -p ${config} --noEmit --showConfig`))),
+//                 };
+//             } catch (error) {
+//                 const message = String(error.output);
+//                 if (message.includes('TS18003')) {
+//                     metadata.errors.push('TS18003');
+//                 } else {
+//                     console.error(`Unhandled error:\n\n${message}\n\n${metadata.configPath}`);
+//                 }
+//             }
+//             return metadata;
+//         };
 
-        const table = new Table({ head: ['', 'Files', 'Size (b)', 'Errors'] });
-        files
-            .filter((file) => !file.includes('node_modules'))
-            .filter((file) => ignoreList
-                .map((ignoreKey) => {
-                    // console.log(resolve(`${rootPath}${x}`))
-                    console.log({ file, ignoreKey: ignoreKey.replace('./', '.*/') });
-                    return String(`${file}`).includes(ignoreKey.replace('./', '.*/'));
-                })
-                .reduce((acc, value) => (acc ? !!acc : !!value), false))
-            .map(inspectConfig)
-            .filter((x) => x)
-            .map(extractStats)
-            .sort((a, b) => a.stats.total - b.stats.total)
-            .map(transformToTable)
-            .map((entry) => {
-                table.push({ [entry.title]: [entry.fileCount, prettyBytes(entry.size), entry.errors] });
-            });
+//         const table = new Table({ head: ['', 'Files', 'Size (b)', 'Errors'] });
+//         files
+//             .filter((file) => !file.includes('node_modules'))
+//             .filter((file) => ignoreList
+//                 .map((ignoreKey) => {
+//                     // console.log(resolve(`${rootPath}${x}`))
+//                     console.log({ file, ignoreKey: ignoreKey.replace('./', '.*/') });
+//                     return String(`${file}`).includes(ignoreKey.replace('./', '.*/'));
+//                 })
+//                 .reduce((acc, value) => (acc ? !!acc : !!value), false))
+//             .map(inspectConfig)
+//             .filter((x) => x)
+//             .map(extractStats)
+//             .sort((a, b) => a.stats.total - b.stats.total)
+//             .map(transformToTable)
+//             .map((entry) => {
+//                 table.push({ [entry.title]: [entry.fileCount, prettyBytes(entry.size), entry.errors] });
+//             });
 
-        console.log(table.toString());
-        console.log(uniqueConfigTypes);
-    });
-};
+//         console.log(table.toString());
+//         console.log(uniqueConfigTypes);
+//     });
+// };
 
 // extract();
 
