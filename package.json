@@ -21,7 +21,7 @@
     "webpack": "webpack -c webpack.config.cjs",
     "clean": "rm -rf dist/",
     "release:build": "mkdir -p dist/bin && tsc -b --clean && tsc -b --force && mkdir -p dist/bin && cp bin/extract.cjs dist/bin/extract.cjs",
-    "release:prepare": "npm run clean && npm run release:build && cd dist/ && node ../scripts/publishing/prepare.js",
+    "release:prepare": "npm run clean && npm run release:build && cd dist/ && node ../scripts/publishing/prepare.cjs",
     "build": "mkdir -p dist && tsc -b",
     "run": "npm run webpack && bash bin/extract",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
