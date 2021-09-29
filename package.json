@@ -17,10 +17,10 @@
   },
   "engineStrict": true,
   "scripts": {
-    "nodemon": "nodemon -e .js -w dist --exec 'webpack && bin/extract.js'",
+    "nodemon": "nodemon -e .js -w dist --exec 'webpack && bin/extract.cjs'",
     "webpack": "webpack -c webpack.config.cjs",
     "clean": "rm -rf dist/",
-    "release:build": "mkdir -p dist/bin && tsc -b --clean && tsc -b --force && mkdir -p dist/bin && cp bin/extract.js dist/bin/extract.js",
+    "release:build": "mkdir -p dist/bin && tsc -b --clean && tsc -b --force && mkdir -p dist/bin && cp bin/extract.cjs dist/bin/extract.cjs",
     "release:prepare": "npm run clean && npm run release:build && cd dist/ && ts-node ../scripts/publishing/prepare.ts",
     "build": "mkdir -p dist && tsc -b",
     "run": "npm run webpack && bash bin/extract",
