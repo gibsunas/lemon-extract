@@ -9,7 +9,7 @@
     "url": "git@github.com:gibsunas/lemon-extract.git"
   },
   "bin": {
-    "@lemon/extract": "bin/extract.js"
+    "@lemon/extract": "bin/extract.cjs"
   },
   "engines": {
     "node": ">=14",
