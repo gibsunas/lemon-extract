@@ -1,6 +1,6 @@
 {
   "name": "@lemon/extract",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "",
   "type": "module",
   "es": "bin/cli.js",
