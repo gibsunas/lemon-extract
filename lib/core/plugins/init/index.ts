@@ -52,9 +52,23 @@ const main = async (lemonContext: LemonContext) => {
     const directoriesInRootDir = getDirectories(lemonContext.rootDir);
     if (lemonContext.config.projects.length !== directoriesInRootDir.length) {
         directoriesInRootDir.forEach((dir) => {
+            // TODO: This should follow .gitignore rules () or we get:
+            /*
+                @lemon/extract:core:plugins:git Starting +0ms
+                @lemon/extract:core:plugins:git Skipping disabled project | .git +1ms
+                @lemon/extract:core:plugins:git Skipping disabled project | .github +0ms
+                @lemon/extract:core:plugins:git Skipping disabled project | bin +0ms
+                @lemon/extract:core:plugins:git Skipping disabled project | dist +0ms
+                @lemon/extract:core:plugins:git Skipping disabled project | lib +0ms
+                @lemon/extract:core:plugins:git Skipping disabled project | node_modules +0ms
+                @lemon/extract:core:plugins:git Skipping disabled project | scripts +0ms
+                @lemon/extract:core:plugins:git Finished +0ms
+            */
+
             const isContextManagementRepo = dir === lemonContext.config.contextRepo ?? undefined;
             const rootDir = `./${dir}`;
-            const matchingProjects = lemonContext.config.projects.filter((p) => p.root === rootDir);
+            const matchingProjects = lemonContext.config.projects
+                .filter((p) => p.root === rootDir);
             const errorMessage = `A duplicate project was detected (likely a bug or .lemon-extract.json misconfiguration): ${rootDir}`;
             switch (matchingProjects.length) {
                 case 0: break;

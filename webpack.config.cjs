@@ -6,7 +6,7 @@ module.exports = {
   entry: './lib/index.ts',
   devtool: 'inline-source-map',
   target: 'node',
-  module: "CommonJS",
+  module: 'CommonJS',
   mode: 'development',
   externals: [nodeExternals()],
   module: {
@@ -25,11 +25,12 @@ module.exports = {
       '@lemon/extract/core': path.resolve(__dirname, 'lib/core/'),
     },
     modules: [
-      'node_modules'
-    ],
-    extensions: ['.tsx', '.ts', '.js'],
-    fallback: {
-      '@nrwl/workspace': false,
+        'node_modules',
+      ],
+      extensions: ['.tsx', '.ts', '.js'],
+      fallback: {
+        '@nrwl/workspace': false,
+          debug: false,
       assert: false,
       child_process: false,
       fs: false,

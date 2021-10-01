@@ -1,14 +1,13 @@
 import { main as LemonExtractCore } from '@lemon/extract/core';
 import { Command } from 'commander';
+import { debug } from 'debug';
 import path from 'path';
-import { debug as Debug } from './utils/debug';
 // import { Nx } from './introspection/nx/index';
 import { readPackageJson } from './utils/index';
 
 const fs = require('fs');
 const glob = require('glob');
 
-const debug = Debug();
 // const transformToTable = (metadata) =>
 // // console.log(metadata.stats)
 // ({
@@ -145,7 +144,7 @@ const context: RunContext = {
 // console.log(introspectNx(context).warnings);
 
 const createExtractCore = async (options) => {
-    debug('Creating LemonExtractCore');
+    debug('@lemon/extract')('Creating LemonExtractCore');
     return LemonExtractCore({ processArgs: options._args });
 };
 

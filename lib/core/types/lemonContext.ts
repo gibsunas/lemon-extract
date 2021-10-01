@@ -8,7 +8,7 @@ export interface LemonContext {
     rootDir: string,
     plugins: Map<string, any>,
     utils: {
-        debug: Debugger
+        debug: typeof Debugger
     }
     flags: {
         isDryRun: boolean,
@@ -24,7 +24,7 @@ export interface LemonContext {
 
 export const initNewContext = (initialContext: Partial<LemonContext>) => {
     const lemonContext: LemonContext = {
-        config: initialContext.config || {},
+        config: initialContext.config || { projects: [] },
         processArgs: undefined,
         plugins: new Map<string, any>(),
         rootDir: initialContext.rootDir || process.cwd(),
