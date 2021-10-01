@@ -30,7 +30,7 @@
     "patch": "npm version patch && npm run release:prepare && cd dist/ && npm publish",
     "minor": "npm version minor && npm run release:prepare && cd dist/ && npm publish",
     "patch:dry": "npm run clean && npm version patch && npm run release:prepare && cd dist/ && npm publish --dry-run",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "lint": "eslint"
   },
   "private": false,
