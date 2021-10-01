@@ -11,7 +11,7 @@
         "importHelpers": true,
         "allowSyntheticDefaultImports": true,
         "tsBuildInfoFile": "dist/.tsbuildinfo",
-        "types": [ "node"],
+        "types": [ "node", "jest"],
         "lib": [
             "ESNext"
         ],
