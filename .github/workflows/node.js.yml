@@ -16,17 +16,17 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 14.x]
+        node-version: [14.x]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run build --if-present
     - run: npm run lint
-    - run: npm run test
+    # - run: npm run test
     - name: Jest coverage report
       uses: ArtiomTr/jest-coverage-report-action@v2.0-rc.4
