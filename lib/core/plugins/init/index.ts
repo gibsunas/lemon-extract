@@ -1,16 +1,32 @@
-import { LemonContext } from '@lemon/extract/core/types/lemonContext';
-import { readdirSync } from 'fs';
+import { LemonContext } from '@lemon/extract/core/types';
+import { LemonConfig } from '@lemon/extract/core/types/lemonConfig';
+// import { readJsonFile, writeJsonFile } from '@nrwl/workspace/src/utilities/fileutils';
+import { lstatSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { ProjectConfig } from '../../repos';
 
-const pluginBase = '@lemon/extract/core/plugins/';
 const name = 'init';
+const pluginBase = '@lemon/extract/core/plugins/';
 const fullName = `${pluginBase}${name}`;
+const extractCmd = `${name}`;
+const description = 'Run this first';
 
 const spaces = (length: number) => Array(length).fill(' ').join('');
 
 const main = async (lemonContext: LemonContext) => {
-    // const debug = Debug.extend("plugins:init")
+    const debug = lemonContext.utils.debug.extend(name);
+    debug('main');
+    // console.log(lemonContext.config);
+    if (lemonContext.config.lemonRcPath) {
+        // we should also create an initial version to hydrate from
+        const lemonConfig: LemonConfig = JSON.parse(String(readFileSync(lemonContext.config.lemonRcPath)));
+        lemonConfig.projects = lemonContext.config.projects;
+        writeFileSync(lemonContext.config.lemonRcPath, JSON.stringify(lemonConfig));
+        return lemonContext;
+    }
+};
+
+const bootstrap = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
 
     const updateMetadata = (lemonContext, project, expectations) => (key) => {
@@ -24,7 +40,7 @@ const main = async (lemonContext: LemonContext) => {
         const expectations = {
             rootDir: resolve(lemonContext.rootDir, project.root),
             isContextManagementRepo: project.name === lemonContext.config.contextRepo,
-            enabled: project.enabled || false,
+            enabled: project.enabled || false
         };
         if (!expectations.enabled) { return; }
 
@@ -41,15 +57,16 @@ const main = async (lemonContext: LemonContext) => {
         update('rootDir');
         update('isContextManagementRepo');
     };
-    debug('Starting', lemonContext.flags.verbosity);
-    lemonContext.flags.verbosity > 1 && debug(lemonContext.config.projects);
+    lemonContext.flags.verbosity > 2 && debug('Starting', lemonContext.flags.verbosity);
+    lemonContext.flags.verbosity > 3 && debug(lemonContext.config.projects);
 
     // Sourced from https://stackoverflow.com/a/24594123/1765430
     const getDirectories = (source) => readdirSync(source, { withFileTypes: true })
         .filter((dirent) => dirent.isDirectory())
         .map((dirent) => dirent.name);
 
-    const directoriesInRootDir = getDirectories(lemonContext.rootDir);
+    const isRootDirActuallyADir = lstatSync(lemonContext.rootDir).isDirectory();
+    const directoriesInRootDir = !isRootDirActuallyADir ? [] : getDirectories(lemonContext.rootDir);
     if (lemonContext.config.projects.length !== directoriesInRootDir.length) {
         directoriesInRootDir.forEach((dir) => {
             // TODO: This should follow .gitignore rules () or we get:
@@ -80,7 +97,7 @@ const main = async (lemonContext: LemonContext) => {
                 name: dir,
                 root: rootDir,
                 enabled: isContextManagementRepo,
-                metadata: {},
+                metadata: {}
             };
             isContextManagementRepo && (project.metadata.isContextManagementRepo = isContextManagementRepo);
 
@@ -89,9 +106,15 @@ const main = async (lemonContext: LemonContext) => {
     }
 
     lemonContext.config.projects.forEach(updateState(lemonContext));
-    debug('Finished');
+    lemonContext.flags.verbosity > 3 && debug(lemonContext.config.projects);
+    lemonContext.flags.verbosity > 2 && debug('Finished');
     return lemonContext;
 };
-
 export { main };
-export default { name: fullName, main };
+export default {
+    name: fullName,
+    extractCmd,
+    description,
+    bootstrap,
+    main
+};

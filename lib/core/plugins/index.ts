@@ -8,9 +8,9 @@ const corePlugins: LemonPlugin[] = [
     init,
     git,
     github,
-    debug,
+    debug
 ];
 
 export {
-    corePlugins,
+    corePlugins
 };

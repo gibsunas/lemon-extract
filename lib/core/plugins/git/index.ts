@@ -6,12 +6,19 @@ import { ProjectConfig } from '../../repos';
 
 const pluginBase = '@lemon/extract/core/plugins/';
 const name = 'git';
+const extractCmd = `${name}`;
+const description = '';
 const fullName = `${pluginBase}${name}`;
 
 const spaces = (length: number) => Array(length).fill(' ').join('');
 
 const main = async (lemonContext: LemonContext) => {
-    // const debug = Debug.extend("plugins:init")
+    const debug = lemonContext.utils.debug.extend(name);
+    debug('main');
+    return lemonContext;
+};
+
+const bootstrap = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
 
     const updateMetadata = (lemonContext, project, expectations) => (key) => {
@@ -38,7 +45,7 @@ const main = async (lemonContext: LemonContext) => {
         const gitOrigin = String(execSync('git remote get-url origin', { cwd: String(project.metadata.rootDir) })).replace('\n', '');
 
         const expectations = {
-            gitOrigin,
+            gitOrigin
         };
         const errorMessage = `Plugin ${fullName} expected project ${project.name} to have metadata. This may mean plugins are initialized incorrectly.`;
         if (!project.metadata) { throw new Error(errorMessage); }
@@ -51,12 +58,18 @@ const main = async (lemonContext: LemonContext) => {
         // update("rootDir");
         // update("isContextManagementRepo");
     };
-    debug('Starting');
+    lemonContext.flags.verbosity > 2 && debug('Starting');
 
     lemonContext.config.projects.forEach(updateState(lemonContext));
-    debug('Finished');
+    lemonContext.flags.verbosity > 2 && debug('Finished');
     return lemonContext;
 };
 
 export { main };
-export default { name: fullName, main };
+export default {
+    name: fullName,
+    extractCmd,
+    description,
+    bootstrap,
+    main
+};

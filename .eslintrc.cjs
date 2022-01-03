@@ -2,21 +2,23 @@ module.exports = {
     env: {
         browser: false,
         node: true,
-        es2021: true,
+        es2021: true
     },
     extends: [
-        'airbnb-base',
+        'standard'
     ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
         ecmaVersion: 12,
-        sourceType: 'module',
+        sourceType: 'module'
     },
     plugins: [
-        '@typescript-eslint',
+        '@typescript-eslint'
     ],
     rules: {
         indent: ['error', 4],
-        'no-unused-expressions': { allowShortCircuit: true, allowTernary: true },
-    },
+        semi: [2, 'always'],
+        '@typescript-eslint/semi': ['error', 'always'],
+        'no-unused-expressions': [2, { allowShortCircuit: true, allowTernary: true }]
+    }
 };

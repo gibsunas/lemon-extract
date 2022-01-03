@@ -8,7 +8,7 @@ A utility tool designed to enable faster debugging of Typescript mono repos.
 $ npm run webpack -- --watch
 
 # Terminal B
-$ DEBUG=@lemon/extract:* node ./bin/extract.js --help
+$ DEBUG=@lemon/extract:* npm run cli -- --help
 ```
 
 ## Running

@@ -1,17 +1,50 @@
-import { Github } from '../integrations/github/index';
+import { LemonContext } from '@lemon/extract/core/types/lemonContext';
+import { readPackageJson } from '@lemon/extract/utils';
+import { Command } from 'commander';
+import { debug } from 'debug';
+import * as path from 'path';
 import { getConfig } from './config';
 import { main as LoadPlugins } from './pluginController';
-import { CoreProjects } from './repos';
 import { initNewContext } from './types/lemonContext';
 
-const fs = require('fs');
+const initializeLocalContext = (upstream: LemonContext, commandOptions?: Record<string, string>) => {
+    const debug = upstream.utils.debug.extend('cli');
+    return {
+        ...upstream,
+        commandOptions,
+        utils: {
+            ...upstream.utils,
+            debug
+        }
+    };
+};
 
-const main = async ({ processArgs }) => {
-    const initialContext = initNewContext({ processArgs });
+export const createExtractCore = async (lemonContext: LemonContext) => {
+    debug('@lemon/extract')('Creating LemonExtractCore');
+    return main(lemonContext);
+};
+
+const commandHandler = (lemonContext: LemonContext, key: string) => async (command: Command) => {
+    // const handlerContext = initializeLocalContext(lemonContext);
+    const handler = await lemonContext.plugins.get(key);
+
+    if (!handler || !handler.extractCmd || !handler.main) { return; }
+    lemonContext.flags.verbosity > 2 && lemonContext.utils.debug(`Plugin has a CLI command. Connecting [${handler.extractCmd}] => ${key} `);
+    command
+        .command(handler.extractCmd)
+        .description(handler.description)
+        .action((options) => handler.main(initializeLocalContext(lemonContext, options)));
+};
+
+const bootstrap = async (options: { cliCommand: Command, processArgs }) => {
+    const packageJson = readPackageJson(path.resolve(__dirname, '..'));
+    options.cliCommand.version(packageJson.version);
+
+    const initialContext = initNewContext({ processArgs: options.processArgs });
     const { debug } = initialContext.utils;
 
-    debug('Initializing');
-    const context = await getConfig(initialContext).then(LoadPlugins)
+    const lemonContext = await getConfig(initialContext)
+        .then(LoadPlugins)
         .catch((error) => {
             debug('Something went wrong while loading plugins');
             console.error(error);
@@ -21,20 +54,55 @@ const main = async ({ processArgs }) => {
             debug('Initialized');
         });
 
-    if (context.flags.verbosity > 0 && !process.env.DEBUG) {
+    const lemonExtract = await createExtractCore(lemonContext);
+    const corePlugins = [
+        '@lemon/extract/core/plugins/init',
+        '@lemon/extract/core/plugins/git',
+        '@lemon/extract/core/plugins/github',
+        '@lemon/extract/core/plugins/debug'
+    ];
+
+    corePlugins.map((key) =>
+        commandHandler(lemonExtract, key)(options.cliCommand)
+    );
+    // options.cliCommand
+    //     .command('github')
+    //     .description('Github')
+    //     .action(() => { });
+
+    // options.cliCommand
+    //     .command('something')
+    //     .description('Something')
+    //     .action(createExtractCore(lemonContext)
+    //         .then(() => something()));
+
+    // options.cliCommand
+    //     .command('gh')
+    //     .description('Github')
+    //     .action(createExtractCore(lemonContext)
+    //         .then(() => github()));
+
+    // options.cliCommand
+    //     .command('projects')
+    //     .description('Projects')
+    //     .action(createExtractCore(lemonContext)
+    //         .then(() => projects()));
+
+    return lemonContext;
+};
+
+const main = async (lemonContext: LemonContext) => {
+    debug('Initializing');
+
+    if (lemonContext.flags.verbosity > 0 && !process.env.DEBUG) {
         debug('🍋 Oh hi there!');
         debug('🍋 Tip: Run with DEBUG=@lemon/extract:* ');
     }
 
-    const github = Github(initialContext);
-    const projects = CoreProjects(context);
-    const something = () => { };
-    return {
-        projects,
-        github,
-        something,
-    };
+    return lemonContext;
 };
+
 export {
-    main,
+    bootstrap,
+    main
 };

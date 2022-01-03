@@ -29,7 +29,7 @@ const getScriptMetadata = (scripts: Record<string, string>) => {
         test: scripts.test,
         build: scripts.build,
         lint: scripts.lint,
-        help: scripts.help,
+        help: scripts.help
     };
     return result;
 };
@@ -66,11 +66,11 @@ export const CoreProjects = (context: LemonContext) => async () => {
         const metadata = {
             git: gitMetadata,
             scripts: scriptMetadata,
-            projectRoot,
+            projectRoot
         };
         const result = {
             // packageJson,
-            metadata,
+            metadata
         };
         console.log(result);
         // console.log(x.repository, x.subject)

@@ -16,8 +16,9 @@ const initializeLocalContext = (upstream: LemonContext) => {
 };
 
 const init = (localContext: LemonContext, currentPlugin: LemonPlugin) => (context: LemonContext) => {
-    localContext.utils.debug(`Wiring in ${currentPlugin.name}`);
-    currentPlugin.main(localContext);
+    localContext.flags.verbosity > 0 && localContext.utils.debug(`    Bootstrapping => ${currentPlugin.name}`);
+    currentPlugin.bootstrap && currentPlugin.bootstrap(localContext);
+    // currentPlugin.main && currentPlugin.main(localContext);
     context.plugins.set(currentPlugin.name, currentPlugin);
     return context;
 };
@@ -27,12 +28,20 @@ const main = async (lemonContext: LemonContext) => {
 
     localContext.utils.debug('Assembling plugins');
     const pluginsToInit = [...corePlugins];
-    return pluginsToInit.reduce((promiseChain, currentPlugin) => promiseChain.then(init(localContext, currentPlugin)), Promise.resolve(lemonContext)).then((context) => {
-        localContext.utils.debug('Plugins loaded');
-        return context; // applyLocalContext(context, localContext);
-    });
+
+    // yes, it's lazy
+    const cb = (promiseChain, currentPlugin) =>
+        promiseChain.then(init(localContext, currentPlugin));
+    return pluginsToInit.reduce(cb, Promise.resolve(lemonContext))
+        .then((context) => {
+            localContext.utils.debug('Plugins loaded');
+            return context; // applyLocalContext(context, localContext);
+        });
 };
 
+const bootstrap = () => { };
+
 export {
-    main,
+    bootstrap,
+    main
 };

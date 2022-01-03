@@ -1,11 +1,16 @@
 import { LemonConfig } from '@lemon/extract/core/types/lemonConfig';
 import { LemonContext } from '@lemon/extract/core/types/lemonContext';
-import fs from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join, resolve } from 'path';
 
 const applyLemonRcToContext = (context: LemonContext, lemonRc: Partial<LemonConfig>) => {
     context.config = { ...context.config, ...lemonRc };
     return context;
+};
+
+const applyContextToLemonRc = (context: LemonContext, lemonRc: Partial<LemonConfig>) => {
+    lemonRc.projects = context.config.projects || [];
+    return lemonRc;
 };
 
 const getConfig = async (context: LemonContext): Promise<LemonContext> => {
@@ -14,19 +19,19 @@ const getConfig = async (context: LemonContext): Promise<LemonContext> => {
 
     debug(`Checking for config ${lemonRcPath}`);
 
-    const hasLemonRc = fs.existsSync(lemonRcPath);
+    const hasLemonRc = existsSync(lemonRcPath);
 
-    if (!hasLemonRc) { return context; }
+    if (!hasLemonRc) { debug('Defaulting to supplied context'); return context; }
 
     debug('Config found!');
-    const config = fs.readFileSync(lemonRcPath, 'utf-8');
-    // console.trace(config)
+    const config = readFileSync(lemonRcPath, 'utf-8');
+
     const lemonRc: Partial<LemonConfig> = { ...JSON.parse(config) as Partial<LemonConfig> };
-    // lemonRc.cwd = cwd;
+
     if (context.flags.verbosity > 1) {
         debug(`.lemonrc => ${JSON.stringify(lemonRc, undefined, 2)}`);
     }
     return applyLemonRcToContext(context, lemonRc);
 };
 
-export { getConfig };
+export { applyContextToLemonRc, applyLemonRcToContext, getConfig };

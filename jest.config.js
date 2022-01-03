@@ -17,7 +17,7 @@ export default {
     // Automatically clear mock calls and instances between every test
     clearMocks: true,
 
-    extensionsToTreatAsEsm: ['.ts'],
+    extensionsToTreatAsEsm: ['.ts', '.test.ts'],
 
     // Indicates whether the coverage information should be collected while executing the test
     collectCoverage: true,
@@ -37,12 +37,12 @@ export default {
     coverageProvider: 'v8',
 
     // A list of reporter names that Jest uses when writing coverage reports
-    // coverageReporters: [
-    //   "json",
-    //   "text",
-    //   "lcov",
-    //   "clover"
-    // ],
+    coverageReporters: [
+        'json',
+        'text',
+        'lcov',
+        'clover'
+    ],
 
     // An object that configures minimum threshold enforcement for coverage results
     // coverageThreshold: undefined,
@@ -63,7 +63,11 @@ export default {
     // globalTeardown: undefined,
 
     // A set of global variables that need to be available in all test environments
-    // globals: {},
+    globals: {
+        'ts-jest': {
+            useESM: true
+        }
+    },
 
     // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
     // maxWorkers: "50%",
@@ -80,11 +84,13 @@ export default {
         'ts',
         'tsx',
         'json',
-        'node',
+        'node'
     ],
 
     // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-    // moduleNameMapper: {},
+    moduleNameMapper: {
+        '^@lemon/extract(.*)$': '<rootDir>/lib$1'
+    },
 
     // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
     // modulePathIgnorePatterns: [],
@@ -121,7 +127,7 @@ export default {
 
     // A list of paths to directories that Jest should use to search for files in
     roots: [
-        'lib',
+        'lib'
     ],
 
     // Allows you to use a custom runner instead of Jest's default test runner
@@ -140,7 +146,7 @@ export default {
     // snapshotSerializers: [],
 
     // The test environment that will be used for testing
-    // testEnvironment: "jest-environment-node",
+    testEnvironment: 'jest-environment-node',
 
     // Options that will be passed to the testEnvironment
     // testEnvironmentOptions: {},
@@ -175,19 +181,20 @@ export default {
     // timers: "real",
 
     // A map from regular expressions to paths to transformers
-    // transform: undefined,
+    transform: { '^.+\\.(ts|tsx)$': 'ts-jest' },
 
     // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
     // transformIgnorePatterns: [
-    //   "/node_modules/",
-    //   "\\.pnp\\.[^\\/]+$"
+    //     "/node_modules/",
+    //     "/lib/",
+    // //   "\\.pnp\\.[^\\/]+$"
     // ],
 
     // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
     // unmockedModulePathPatterns: undefined,
 
     // Indicates whether each individual test should be reported during the run
-    // verbose: undefined,
+    verbose: true
 
     // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
     // watchPathIgnorePatterns: [],

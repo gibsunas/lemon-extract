@@ -1,5 +1,5 @@
+import { readPackageJson } from '@lemon/extract/utils';
 import { resolve } from 'path';
-import { readPackageJson } from "@lemon/extract/utils";
 
 const nrwlPackagesToScan = [
     '@nrwl/angular',
@@ -21,16 +21,15 @@ const nrwlPackagesToScan = [
     '@nrwl/web',
     '@nrwl/workspace',
     'create-nx-plugin',
-    'create-nx-workspace',
+    'create-nx-workspace'
     // 'nx',
 ];
-
 
 const monitoredPackages = nrwlPackagesToScan;
 const filterUnmonitoredPackages = (dependencies: Object = {}) => {
     const packages: string[] = Object.getOwnPropertyNames(dependencies).filter((x) => monitoredPackages.includes(x));
     return packages.map((x) => ({ [x]: dependencies[x] }));
-}
+};
 interface NxMetaData {
 
 }
@@ -45,11 +44,11 @@ const processPackageJson: (contents: any) => PackageMetadata = (contents: any = 
         dependencies: contents.dependencies,
         filteredDependencies: filterUnmonitoredPackages(contents.dependencies),
         peerDependencies: filterUnmonitoredPackages(contents.peerDependencies),
-        version: contents.version,
+        version: contents.version
     };
 
     return result;
-}
+};
 
 const gatherMetadata = (path: string = process.cwd()) => {
     const nodeModulesPath = resolve(path, 'node_modules');
@@ -62,5 +61,5 @@ const gatherMetadata = (path: string = process.cwd()) => {
 };
 
 export {
-    gatherMetadata,
-}
+    gatherMetadata
+};

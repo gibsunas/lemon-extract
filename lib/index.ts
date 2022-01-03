@@ -1,9 +1,5 @@
-import { main as LemonExtractCore } from '@lemon/extract/core';
+import { bootstrap as BootstrapLemonExtract } from '@lemon/extract/core';
 import { Command } from 'commander';
-import { debug } from 'debug';
-import path from 'path';
-// import { Nx } from './introspection/nx/index';
-import { readPackageJson } from './utils/index';
 
 const fs = require('fs');
 const glob = require('glob');
@@ -132,9 +128,9 @@ interface RunContext {
   rootDir: string,
 }
 
-const context: RunContext = {
-    rootDir: '/Users/james/src/prototypes/my-workspace',
-};
+// const context: RunContext = {
+//     rootDir: '/Users/james/src/prototypes/my-workspace'
+// };
 
 // const context: runContext = {
 //   rootDir: '/Users/james/src/gibsunas/@lemon/extract'
@@ -143,29 +139,13 @@ const context: RunContext = {
 // console.log(Nx(context))
 // console.log(introspectNx(context).warnings);
 
-const createExtractCore = async (options) => {
-    debug('@lemon/extract')('Creating LemonExtractCore');
-    return LemonExtractCore({ processArgs: options._args });
-};
-
-const main = () => {
-    const packageJson = readPackageJson(path.resolve(__dirname, '..'));
+const main = async () => {
     const program = new Command();
-    program
-        .version(packageJson.version);
+
     // .option('-c, --config <path>', 'set config path', './.lemon-extract.json');
 
-    program
-        .command('gh')
-        .description('Github')
-        .action((options) => createExtractCore(options)
-            .then(({ github }) => github()));
-
-    program
-        .command('projects')
-        .description('Projects')
-        .action((options) => createExtractCore(options)
-            .then(({ projects }) => projects()));
+    // Let's give the plugins a chance to alter the CLI dynamically
+    await BootstrapLemonExtract({ cliCommand: program, processArgs: process.argv });
 
     // program
     //   .command('ts')
@@ -181,12 +161,6 @@ const main = () => {
     //         debug('Launching workspace linting');
     //         console.log(Nx(context));
     //       });
-
-    program
-        .command('something')
-        .description('Something')
-        .action((options) => createExtractCore(options)
-            .then(({ something }) => something()));
 
     program.parse(process.argv);
 };

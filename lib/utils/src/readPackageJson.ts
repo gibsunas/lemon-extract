@@ -1,6 +1,6 @@
-import { readJsonFile } from '@nrwl/workspace';
 import { existsSync } from 'fs';
 
+const { readJsonFile } = require('@nrwl/workspace');
 export type PackageJson = {
     name: string,
     license?: string,
@@ -11,7 +11,7 @@ export type PackageJson = {
     peerDependencies?: Record<string, string>,
     optionalDependencies?: Record<string, string>,
     scripts?: Record<string, string>,
-}
+};
 
 const readPackageJson = (path: string) => {
     const packagePath = `${path}/package.json`;
@@ -20,5 +20,5 @@ const readPackageJson = (path: string) => {
 };
 
 export {
-    readPackageJson,
+    readPackageJson
 };
