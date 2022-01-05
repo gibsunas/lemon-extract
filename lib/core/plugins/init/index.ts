@@ -65,7 +65,7 @@ const bootstrap = async (lemonContext: LemonContext) => {
         .filter((dirent) => dirent.isDirectory())
         .map((dirent) => dirent.name);
 
-    const isRootDirActuallyADir = lstatSync(lemonContext.rootDir).isDirectory();
+    const isRootDirActuallyADir = lstatSync(lemonContext.rootDir).isDirectory(); // future handling of rootdirless might be interesting
     const directoriesInRootDir = !isRootDirActuallyADir ? [] : getDirectories(lemonContext.rootDir);
     if (lemonContext.config.projects.length !== directoriesInRootDir.length) {
         directoriesInRootDir.forEach((dir) => {

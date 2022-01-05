@@ -12,7 +12,7 @@ interface LemonContext {
     plugins: Map<string, any>,
     utils: {
         debug: typeof Debugger
-        fetch: typeof fetch
+        fetch?: typeof fetch
     }
     flags: {
         isDryRun: boolean,
