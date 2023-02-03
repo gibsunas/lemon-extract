@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model LemonExtractProject {
+  id               String                    @id @default(uuid())
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt()
+  name             String
+  LemonExtractScan LemonExtractProjectScan[]
+}
+
+model GitCommit {
+  sha       String   @id
+  createdAt DateTime @default(now())
+  timestamp DateTime
+  message   String
+
+  LemonExtractProjectState LemonExtractProjectState[]
+}
+
+model LemonExtractProjectState {
+  id                      String                    @id @default(uuid())
+  projectConfigHash       String
+  commit                  GitCommit?                @relation(fields: [gitCommitId], references: [sha])
+  gitCommitId             String?
+  LemonExtractProjectScan LemonExtractProjectScan[]
+}
+
+model LemonExtractProjectScan {
+  id                      String                    @id @default(uuid())
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt()
+  projectId               String
+  project                 LemonExtractProject       @relation(fields: [projectId], references: [id])
+  projectStateId          String
+  projectState            LemonExtractProjectState  @relation(fields: [projectStateId], references: [id])
+  LemonExtractScanRecords LemonExtractScanRecords[]
+}
+
+model LemonExtractScanRecords {
+  id            String                  @id @default(uuid())
+  projectScanId String
+  projectScan   LemonExtractProjectScan @relation(fields: [projectScanId], references: [id])
+
+
+}
+
+model Package {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}

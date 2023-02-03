@@ -7,6 +7,15 @@ import { getConfig } from './config';
 import { main as LoadPlugins } from './pluginController';
 import { initNewContext } from './types/lemonContext';
 
+const corePlugins = [
+    '@lemon/extract/core/plugins/init',
+    '@lemon/extract/core/plugins/git',
+    '@lemon/extract/core/plugins/github',
+    '@lemon/extract/core/plugins/npm',
+    '@lemon/extract/core/plugins/scan',
+    '@lemon/extract/core/plugins/debug'
+];
+
 const initializeLocalContext = (upstream: LemonContext, commandOptions?: Record<string, string>) => {
     const debug = upstream.utils.debug.extend('cli');
     return {
@@ -19,18 +28,18 @@ const initializeLocalContext = (upstream: LemonContext, commandOptions?: Record<
     };
 };
 
-export const createExtractCore = async (lemonContext: LemonContext) => {
+export const createExtractCore = (lemonContext: LemonContext) => {
     debug('@lemon/extract')('Creating LemonExtractCore');
     return main(lemonContext);
 };
 
 const commandHandler = (lemonContext: LemonContext, key: string) => async (command: Command) => {
     // const handlerContext = initializeLocalContext(lemonContext);
-    const handler = await lemonContext.plugins.get(key);
+    const handler = lemonContext.plugins.get(key);
 
     if (!handler || !handler.extractCmd || !handler.main) { return; }
     lemonContext.flags.verbosity > 2 && lemonContext.utils.debug(`Plugin has a CLI command. Connecting [${handler.extractCmd}] => ${key} `);
-    command
+    await command
         .command(handler.extractCmd)
         .description(handler.description)
         .action((options) => handler.main(initializeLocalContext(lemonContext, options)));
@@ -55,15 +64,9 @@ const bootstrap = async (options: { cliCommand: Command, processArgs }) => {
         });
 
     const lemonExtract = await createExtractCore(lemonContext);
-    const corePlugins = [
-        '@lemon/extract/core/plugins/init',
-        '@lemon/extract/core/plugins/git',
-        '@lemon/extract/core/plugins/github',
-        '@lemon/extract/core/plugins/debug'
-    ];
-
-    corePlugins.map((key) =>
-        commandHandler(lemonExtract, key)(options.cliCommand)
+    debug(lemonContext);
+    corePlugins.map(async (key) =>
+        await commandHandler(lemonExtract, key)(options.cliCommand)
     );
     // options.cliCommand
     //     .command('github')
@@ -87,7 +90,7 @@ const bootstrap = async (options: { cliCommand: Command, processArgs }) => {
     //     .description('Projects')
     //     .action(createExtractCore(lemonContext)
     //         .then(() => projects()));
-
+    debug('Initialized');
     return lemonContext;
 };
 

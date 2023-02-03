@@ -1,7 +1,6 @@
 import { ProjectDao } from '@lemon/extract/core/plugins/github/dao';
 import { ProjectConfig } from '@lemon/extract/core/repos';
 import { LemonContext } from '@lemon/extract/core/types/lemonContext';
-import { join as PathJoin } from 'path';
 type DefaultRepoActions = {
     init: () => Promise<void>,
 };
@@ -32,17 +31,17 @@ const fullName = `${pluginBase}${name}`;
 const spaces = (length: number) => Array(length).fill(' ').join('');
 
 const fetchFile = (project) => async (filePathRelativeToRoot) => {
-    console.log(
-        project,
-        project.metadata,
-        PathJoin(project.metadata.githubURI || '', filePathRelativeToRoot || '')
-    );
+    // console.log(
+    //     project,
+    //     project.metadata,
+    //     PathJoin(project.metadata.githubURI || '', filePathRelativeToRoot || '')
+    // );
     return '1';
 };
 const main = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
     debug('main');
-    lemonContext.plugins.get('@lemon/extract/core/plugins/debug').main(lemonContext);
+    // lemonContext.plugins.get('@lemon/extract/core/plugins/debug').main(lemonContext);
     return lemonContext;
 };
 
