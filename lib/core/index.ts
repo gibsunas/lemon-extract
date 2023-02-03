@@ -12,6 +12,7 @@ const corePlugins = [
     '@lemon/extract/core/plugins/git',
     '@lemon/extract/core/plugins/github',
     '@lemon/extract/core/plugins/npm',
+    '@lemon/extract/core/plugins/scan',
     '@lemon/extract/core/plugins/debug'
 ];
 

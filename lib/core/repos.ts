@@ -1,20 +1,23 @@
 import { GithubActions } from '@lemon/extract/core/plugins/github';
+import { ScanActions } from '@lemon/extract/core/plugins/scan';
 import { LemonContext } from '@lemon/extract/core/types/lemonContext';
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import { readPackageJson } from '../utils';
 
-const gitStat2JsonPath = path.resolve(__dirname, '../lib/utils/external/git-log2json', 'git-stat2json');
+// const gitStat2JsonPath = path.resolve(__dirname, '../lib/utils/external/git-log2json', 'git-stat2json');
 // console.log(gitStat2JsonPath)
 export type ProjectConfigMetadata = {
 
 };
 export type ProjectConfig = {
+    id?: string,
     name?: string,
     enabled?: boolean,
     root?: string,
     githubActions?: GithubActions,
+    scanActions?: ScanActions,
     metadata?: Record<string, string | boolean | number>,
 };
 
@@ -73,6 +76,7 @@ export const CoreProjects = (context: LemonContext) => async () => {
             metadata
         };
         console.log(result);
+        return result;
         // console.log(x.repository, x.subject)
     });
 
