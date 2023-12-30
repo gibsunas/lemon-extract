@@ -1,0 +1,28 @@
+{
+    "environments": [
+        {
+            "id": "create-react-app-environment-localhost",
+            "name": "localhost",
+            "address": "http://127.0.0.1:3000",
+            "isDev": true,
+            "isQA": false,
+            "isProd": false
+        }
+    ],
+    "services": [
+        {
+            "name": "create-react-app-react-scripts-start",
+            "environmentId": "create-react-app-environment-localhost",
+            "address": "127.0.0.1",
+            "port": "3000",
+            "protocol": "http"
+        },
+        {
+            "name": "create-react-app-react-database",
+            "environmentId": "create-react-app-environment-localhost",
+            "address": "127.0.0.1",
+            "port": "5432",
+            "protocol": "postgresql"
+        }
+    ]
+}

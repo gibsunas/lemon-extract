@@ -3,6 +3,8 @@ import Arborist from '@npmcli/arborist';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import { ProjectConfig } from '../../repos';
+import { spaces } from '../../ui/shittyFirstDraft';
+
 
 const pluginBase = '@lemon/extract/core/plugins/';
 const name = 'npm';
@@ -10,15 +12,12 @@ const extractCmd = `${name}`;
 const description = '';
 const fullName = `${pluginBase}${name}`;
 
-const spaces = (length: number) => Array(length).fill(' ').join('');
-
 const main = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
     debug('main');
-    // const localContext = await bootstrap(lemonContext);
     lemonContext.config.projects.forEach((projectConfig) => {
         if (!projectConfig.enabled && !projectConfig.metadata?.arborist) { return; };
-        // debug(projectConfig);
+
     });
 
     return lemonContext;
@@ -49,28 +48,22 @@ const updateState = (lemonContext: LemonContext) => async (project: ProjectConfi
     })
         .buildIdealTree({})
         .then(async (tree) => {
-            // debug(Object.keys(tree));
-            // console.dir({ name: 'pinned', tree });
+
             const arboristChildren = new Map(tree.children);
             const expectations = {
                 arborist: tree,
                 arboristChildren,
-                arboristInventory: tree.inventory,
-                apple: tree.resolve('@angular-devkit/core').pkgid,
-                banana: arboristChildren.get('@angular-devkit/core')
+                arboristInventory: tree.inventory
             };
-            // debug(expectations.banana);
             const errorMessage = `Plugin ${fullName} expected project ${project.name} to have metadata. This may mean plugins are initialized incorrectly.`;
             if (!project.metadata) { throw new Error(errorMessage); }
 
             const update = updateMetadata(lemonContext, project, expectations);
 
-            update('apple');
-            update('banana');
             update('arborist');
-            update('arboristChildren');
             update('arboristInventory');
-            debug(project);
+            lemonContext.flags.verbosity > 4 && debug(project);
+
             project.scanActions && await project.scanActions.repo.refresh();
             return tree;
             // console.dir(
@@ -87,22 +80,7 @@ const updateState = (lemonContext: LemonContext) => async (project: ProjectConfi
             // );
         }).catch(lemonContext.utils.debug);
     updateMetadata(lemonContext, project, { arborist });
-    // if (!hasGitDir) {
-    //     lemonContext.flags.verbosity > 1 && debug(`Project is missing the .git folder. Skipping | ${project.name}`);
-    //     return;
-    // }
 
-    // const gitOrigin = String(execSync('git remote get-url origin', { cwd: String(project.metadata.rootDir) })).replace('\n', '');
-
-    //     arborist.children.values()
-    // )
-    //     .map(
-    //         (child) => ({
-    //             name: child.name,
-    //             childrenCount: Array.from(child.children.values()).length,
-    //             children: Array.from(child.children.values()).map(p => `${p.name}@${p.version}`)
-    //         })
-    //     );
 };
 
 const bootstrap = async (lemonContext: LemonContext) => {

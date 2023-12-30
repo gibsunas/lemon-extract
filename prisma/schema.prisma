@@ -10,6 +10,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// LemonExtractProject
+// This represents a single project that has been identified
+// during a scan or provided via .lemonrc
+//
+// Question: How do projects relate to other projects?
+//  Specifically What happens when a project is merged into another project
+//  This sorta relates to microservice definitions, a single 'app' could be 20
+//  repos. Seeing the cross repo history by creating a timeline of scan snapshots
+//  seems really really useful.
+
 model LemonExtractProject {
   id               String                    @id @default(uuid())
   createdAt        DateTime                  @default(now())
@@ -18,14 +28,30 @@ model LemonExtractProject {
   LemonExtractScan LemonExtractProjectScan[]
 }
 
+// GitCommit
+// Represents a single point in time of a (usually) single project
+// Relates to scan records and future deployment records
+// Specifically used to build timelines of project states from scans
 model GitCommit {
-  sha       String   @id
+  sha       String   @id @default(uuid())
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
   timestamp DateTime
   message   String
 
   LemonExtractProjectState LemonExtractProjectState[]
-}
+
+
+// LemonExtractProjectState
+// This model is specifically here to account for configuration changes
+// of the lemon extract tooling
+// should the config change we may need to rescan existing commits
+// to get the latest scan results
+//
+// Question:
+//    Are rescans actually needed? I did presume this record would at least
+//    serve as a historical marker to help with database management
 
 model LemonExtractProjectState {
   id                      String                    @id @default(uuid())
@@ -35,27 +61,140 @@ model LemonExtractProjectState {
   LemonExtractProjectScan LemonExtractProjectScan[]
 }
 
+// LemonExtractProjectScan
+// Parent scan record connecting individual LemonExtractScanRecords to projects / project states
 model LemonExtractProjectScan {
-  id                      String                    @id @default(uuid())
-  createdAt               DateTime                  @default(now())
-  updatedAt               DateTime                  @updatedAt()
+  id                      String                   @id @default(uuid())
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt()
   projectId               String
-  project                 LemonExtractProject       @relation(fields: [projectId], references: [id])
+  project                 LemonExtractProject      @relation(fields: [projectId], references: [id])
   projectStateId          String
-  projectState            LemonExtractProjectState  @relation(fields: [projectStateId], references: [id])
-  LemonExtractScanRecords LemonExtractScanRecords[]
+  projectState            LemonExtractProjectState @relation(fields: [projectStateId], references: [id])
+  extractId               String
+  extract                 Extract                  @relation(fields: [extractId], references: [id])
+  LemonExtractScanRecords LemonExtractScanRecord[]
 }
 
-model LemonExtractScanRecords {
+model LemonExtractScanRecord {
   id            String                  @id @default(uuid())
   projectScanId String
   projectScan   LemonExtractProjectScan @relation(fields: [projectScanId], references: [id])
-
-
+  packageName   String
+  packageURI    String?
+  package       Package?                @relation(fields: [packageURI], references: [id])
+  extract       Extract?                @relation(fields: [extractId], references: [id])
+  extractId     String?
 }
 
+// Package
+// This model is intended to represent a single npm package
+// It easily could be installed in multiple LemonExtractProject
+// From an application perspective we use the resolvedUri as the ID, we might consider including a package hash as well
+// This way if a package happened to come from N + 1 sources the system could know that it is infact incorrect relative
+// to/  the intended behavior
+//
+// Question:
+//    This is probably not yet npm specific from a domain perspective, should it be?
+//
 model Package {
   id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+
+  name                    String
+  version                 String
+  resolvedUri             String
+  LemonExtractScanRecords LemonExtractScanRecord[]
 }
+
+// Extract
+//
+// This represents the real scan records before any processing
+//   They could be:
+//     package-lock.json
+//     yarn.lock
+//     graphql schemas
+//
+// Basically its a string value that could be reused later for audits or repairs
+model Extract {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  inputData               String?
+  LemonExtractScanRecords LemonExtractScanRecord[]
+  LemonExtractProjectScan LemonExtractProjectScan[]
+  gqlSchema               String?
+  lockFile                String?
+  commit                  GitCommit?                @relation(fields: [gitCommitId], references: [sha])
+  gitCommitId             String?
+}
+
+// Environment
+//
+// This represents the virtual declared borders around
+// any number of services
+//
+// An environment could be local to an engineer, or it could represent prod
+model Environment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  name   String
+  isDev  Boolean
+  isQA   Boolean
+  isProd Boolean
+
+  address    String?
+  Services   Services[]
+  Deployment Deployment[]
+}
+
+// Services
+//
+// This represents deployed services in environments
+model Services {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  name String
+
+  description String?
+  address     String
+  port        String
+  protocol    String?
+
+  environmentId String
+  Environment   Environment @relation(fields: [environmentId], references: [id])
+}
+
+// Deployment
+//
+// This is the pairing between services and environments
+model Deployment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  name      String
+
+  replacesDeploymentId String?
+
+  environmentId String
+  Environment   Environment @relation(fields: [environmentId], references: [id])
+}
+
+// Proposed models:
+//    Package lock files are  very similar to gql schema files
+//      both are strings, both can be stored
+//    Deployments
+//    DeploymentTargets
+//    ScanTargets
+
+// A project can be scanned
+// A scan always relates to extract
+// Project state is driven by extracts
+//
+
