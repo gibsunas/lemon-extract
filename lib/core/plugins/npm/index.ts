@@ -4,6 +4,8 @@ import { existsSync } from 'fs';
 import * as path from 'path';
 import { ProjectConfig } from '../../repos';
 import { spaces } from '../../ui/shittyFirstDraft';
+
+
 const pluginBase = '@lemon/extract/core/plugins/';
 const name = 'npm';
 const extractCmd = `${name}`;
@@ -15,6 +17,7 @@ const main = async (lemonContext: LemonContext) => {
     debug('main');
     lemonContext.config.projects.forEach((projectConfig) => {
         if (!projectConfig.enabled && !projectConfig.metadata?.arborist) { return; };
+
     });
 
     return lemonContext;
@@ -45,13 +48,13 @@ const updateState = (lemonContext: LemonContext) => async (project: ProjectConfi
     })
         .buildIdealTree({})
         .then(async (tree) => {
+
             const arboristChildren = new Map(tree.children);
             const expectations = {
                 arborist: tree,
                 arboristChildren,
                 arboristInventory: tree.inventory
             };
-
             const errorMessage = `Plugin ${fullName} expected project ${project.name} to have metadata. This may mean plugins are initialized incorrectly.`;
             if (!project.metadata) { throw new Error(errorMessage); }
 
@@ -60,6 +63,7 @@ const updateState = (lemonContext: LemonContext) => async (project: ProjectConfi
             update('arborist');
             update('arboristInventory');
             lemonContext.flags.verbosity > 4 && debug(project);
+
             project.scanActions && await project.scanActions.repo.refresh();
             return tree;
             // console.dir(
@@ -76,6 +80,7 @@ const updateState = (lemonContext: LemonContext) => async (project: ProjectConfi
             // );
         }).catch(lemonContext.utils.debug);
     updateMetadata(lemonContext, project, { arborist });
+
 };
 
 const bootstrap = async (lemonContext: LemonContext) => {

@@ -19,6 +19,7 @@ datasource db {
 //  This sorta relates to microservice definitions, a single 'app' could be 20
 //  repos. Seeing the cross repo history by creating a timeline of scan snapshots
 //  seems really really useful.
+
 model LemonExtractProject {
   id               String                    @id @default(uuid())
   createdAt        DateTime                  @default(now())
@@ -35,12 +36,12 @@ model GitCommit {
   sha       String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+
   timestamp DateTime
   message   String
 
   LemonExtractProjectState LemonExtractProjectState[]
-  Extract                  Extract[]
-}
+
 
 // LemonExtractProjectState
 // This model is specifically here to account for configuration changes
@@ -51,6 +52,7 @@ model GitCommit {
 // Question:
 //    Are rescans actually needed? I did presume this record would at least
 //    serve as a historical marker to help with database management
+
 model LemonExtractProjectState {
   id                      String                    @id @default(uuid())
   projectConfigHash       String
@@ -195,3 +197,4 @@ model Deployment {
 // A scan always relates to extract
 // Project state is driven by extracts
 //
+

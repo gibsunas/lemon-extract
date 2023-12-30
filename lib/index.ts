@@ -1,8 +1,8 @@
 import { bootstrap as BootstrapLemonExtract } from '@lemon/extract/core';
 import { Command } from 'commander';
 
-const fs = require('fs');
-const glob = require('glob');
+// const fs = require('fs');
+// const glob = require('glob');
 
 // const transformToTable = (metadata) =>
 // // console.log(metadata.stats)

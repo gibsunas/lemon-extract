@@ -4,13 +4,13 @@ import { existsSync } from 'fs';
 import * as path from 'path';
 import { ProjectConfig } from '../../repos';
 import { spaces } from '../../ui/shittyFirstDraft';
+
 const pluginBase = '@lemon/extract/core/plugins/';
 const name = 'scan';
 const extractCmd = `${name}`;
 const description = '';
 const fullName = `${pluginBase}${name}`;
 
-// const spaces = (length: number) => Array(length).fill(' ').join('');
 type DefaultScanActions = {
     init: () => Promise<void>,
 };
@@ -36,6 +36,7 @@ const main = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
     debug('main');
     // const localContext = await bootstrap(lemonContext);
+
     Promise.all(
         [lemonContext
             .config
@@ -177,6 +178,7 @@ const main = async (lemonContext: LemonContext) => {
                 debug('main completed');
             }
         );
+
     return lemonContext;
 };
 const updateMetadata = (lemonContext, project, expectations) => async (key) => {
@@ -191,12 +193,14 @@ const updateState = (lemonContext: LemonContext) => async (project: ProjectConfi
     const debug = lemonContext.utils.debug.extend(name);
     if (!project.enabled) {
         lemonContext.flags.verbosity > 4 && debug(`Skipping disabled project | ${project.name}`);
+
         return;
     }
     const epectedPackagePath = path.join(String(project.metadata.rootDir), 'package.json');
     const hasPackagePath = existsSync(epectedPackagePath);
     if (!hasPackagePath) {
         lemonContext.flags.verbosity > 4 && debug(`Project is missing the package.json. Skipping | ${project.name}`);
+
         return;
     }
 
@@ -211,10 +215,12 @@ const updateState = (lemonContext: LemonContext) => async (project: ProjectConfi
 
 const bootstrap = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
+
     lemonContext.flags.verbosity > 4 && debug('Starting');
 
     await Promise.all(lemonContext.config.projects.map(await updateState(lemonContext)));
     lemonContext.flags.verbosity > 4 && debug('Finished');
+
     return lemonContext;
 };
 

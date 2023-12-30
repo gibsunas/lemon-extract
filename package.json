@@ -9,7 +9,7 @@
     "url": "git@github.com:gibsunas/lemon-extract.git"
   },
   "bin": {
-    "@lemon/extract": "bin/cli.cjs"
+    "@lemon/extract": "./bin/extract"
   },
   "engines": {
     "node": ">=14",
@@ -39,6 +39,7 @@
   "dependencies": {
     "@angular-devkit/schematics": "^11.2.6",
     "@nrwl/workspace": "^11.5.2",
+    "@prisma/client": "^4.8.1",
     "cli-table": "^0.3.1",
     "commander": "^2.20.3",
     "debug": "^4.3.2",
@@ -55,6 +56,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.13.0",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.12.13",
+    "@npmcli/arborist": "^4.2.0",
     "@types/jest": "^27.0.2",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
@@ -72,6 +74,7 @@
     "jest-cli": "^27.2.5",
     "node-notifier": "^10.0.0",
     "nodemon": "^2.0.9",
+    "prisma": "^4.8.1",
     "ts-jest": "^27.0.5",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
