@@ -1,0 +1,11 @@
+{
+    "verbosity": 1,
+    "projects": [
+        {
+            "id": "create-react-app",
+            "name": "app",
+            "enabled": true,
+            "root": "./app"
+        }
+    ]
+}

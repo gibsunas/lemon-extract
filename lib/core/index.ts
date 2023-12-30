@@ -7,6 +7,15 @@ import { getConfig } from './config';
 import { main as LoadPlugins } from './pluginController';
 import { initNewContext } from './types/lemonContext';
 
+const corePlugins = [
+    '@lemon/extract/core/plugins/init',
+    '@lemon/extract/core/plugins/git',
+    '@lemon/extract/core/plugins/github',
+    '@lemon/extract/core/plugins/npm',
+    '@lemon/extract/core/plugins/scan',
+    '@lemon/extract/core/plugins/debug'
+];
+
 const initializeLocalContext = (upstream: LemonContext, commandOptions?: Record<string, string>) => {
     const debug = upstream.utils.debug.extend('cli');
     return {
