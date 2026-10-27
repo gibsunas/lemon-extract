@@ -21,9 +21,12 @@ const main = async (lemonContext: LemonContext) => {
     const pluginsToInit = [...corePlugins];
     localContext.utils.debug('Assembling plugins');
 
-    pluginsToInit.forEach(async (currentPlugin) => {
+    // Sequential on purpose: bootstrap order is load-bearing (init creates the
+    // project list that git/github/npm/scan read), and `forEach` would not
+    // await the async handlers before the CLI wires up commands.
+    for (const currentPlugin of pluginsToInit) {
         await init(localContext, currentPlugin)(lemonContext);
-    });
+    }
     localContext.utils.debug('Plugins loaded');
     localContext.utils.debug('Assembled plugins');
     return lemonContext;

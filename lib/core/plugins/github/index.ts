@@ -1,6 +1,7 @@
+import { LemonContext } from '@lemon/extract/core/types/lemonContext';
+import { bootstrap as bootstrapGithub, main as githubMain } from '@lemon/extract/integrations/github';
 import { ProjectDao } from '@lemon/extract/core/plugins/github/dao';
 import { ProjectConfig } from '@lemon/extract/core/repos';
-import { LemonContext } from '@lemon/extract/core/types/lemonContext';
 type DefaultRepoActions = {
     init: () => Promise<void>,
 };
@@ -25,7 +26,7 @@ export type GithubActions = Partial<GithubPluginActions>;
 const pluginBase = '@lemon/extract/core/plugins/';
 const name = 'github';
 const extractCmd = `${name}`;
-const description = '';
+const description = 'Report the authenticated GitHub viewer and what the token may do';
 const fullName = `${pluginBase}${name}`;
 
 const spaces = (length: number) => Array(length).fill(' ').join('');
@@ -41,13 +42,19 @@ const fetchFile = (project) => async (filePathRelativeToRoot) => {
 const main = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
     debug('main');
-    // lemonContext.plugins.get('@lemon/extract/core/plugins/debug').main(lemonContext);
-    return lemonContext;
+    // `lemon-extract github` prints the viewer record (issue #6). The plugin
+    // default export stays the registry entry; the command body lives in the
+    // integration so the MCP tools and the CLI share one implementation.
+    return githubMain(lemonContext);
 };
 
 const bootstrap = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
     lemonContext.flags.verbosity > 2 && debug('Launching');
+
+    // Attach the viewer + capability record before any project work. A missing
+    // credential is not fatal here; the individual GitHub commands report it.
+    await bootstrapGithub(lemonContext);
 
     const githubActions: (project) => GithubActions = (project): Partial<GithubPluginActions> => {
         if (!project.metadata.githubId) {

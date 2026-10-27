@@ -1,4 +1,4 @@
-/* eslint-disable no-unreachable */
+ 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { gatherMetadata } from './gather';
@@ -21,9 +21,9 @@ interface IntrospectionWarning extends Introspection {
   type: 'warning'
 }
 interface IntrospectionResult {
-  errors: Object[],
+  errors: object[],
   name: string,
-  warnings: Object[],
+  warnings: object[],
 }
 interface NxIntrospectionResult extends IntrospectionResult {
   versions? : { cli?: { global?: string, local?: string }, workspace?: string },

@@ -41,8 +41,8 @@ model GitCommit {
   message   String
 
   LemonExtractProjectState LemonExtractProjectState[]
-
-
+  Extract                  Extract[]
+}
 // LemonExtractProjectState
 // This model is specifically here to account for configuration changes
 // of the lemon extract tooling

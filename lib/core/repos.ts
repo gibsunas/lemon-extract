@@ -8,9 +8,7 @@ import { readPackageJson } from '../utils';
 
 // const gitStat2JsonPath = path.resolve(__dirname, '../lib/utils/external/git-log2json', 'git-stat2json');
 // console.log(gitStat2JsonPath)
-export type ProjectConfigMetadata = {
-
-};
+export type ProjectConfigMetadata = Record<string, unknown>;
 export type ProjectConfig = {
     id?: string,
     name?: string,

@@ -26,13 +26,11 @@ const nrwlPackagesToScan = [
 ];
 
 const monitoredPackages = nrwlPackagesToScan;
-const filterUnmonitoredPackages = (dependencies: Object = {}) => {
+const filterUnmonitoredPackages = (dependencies: object = {}) => {
     const packages: string[] = Object.getOwnPropertyNames(dependencies).filter((x) => monitoredPackages.includes(x));
     return packages.map((x) => ({ [x]: dependencies[x] }));
 };
-interface NxMetaData {
-
-}
+type NxMetaData = Record<string, unknown>;
 
 interface PackageMetadata {
     version: string;

@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "composite": true,
-        "target": "ES2020",
+        "target": "ES2022",
         "rootDir": "lib/",
         "skipLibCheck": true,
         "sourceMap": true,
@@ -10,13 +10,18 @@
         "experimentalDecorators": true,
         "importHelpers": true,
         "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
         "tsBuildInfoFile": "dist/.tsbuildinfo",
-        "types": [ "node", "jest"],
+        "types": [
+            "node",
+            "jest"
+        ],
         "lib": [
-            "ESNext"
+            "ES2022",
+            "DOM"
         ],
         "module": "ESNext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "baseUrl": ".",
         "outDir": "dist",
         "paths": {
@@ -26,9 +31,11 @@
         }
     },
     "include": [
-        "lib/**/*",
+        "lib/**/*"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist",
+        "**/*.test.ts"
     ]
 }

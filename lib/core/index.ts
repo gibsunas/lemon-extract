@@ -64,10 +64,12 @@ const bootstrap = async (options: { cliCommand: Command, processArgs }) => {
         });
 
     const lemonExtract = await createExtractCore(lemonContext);
-    debug(lemonContext);
-    corePlugins.map(async (key) =>
-        await commandHandler(lemonExtract, key)(options.cliCommand)
-    );
+    debug(lemonExtract);
+    // Commands must exist before `program.parse()`, so register them in order
+    // rather than firing promise-per-plugin with `map`.
+    for (const key of corePlugins) {
+        await commandHandler(lemonExtract, key)(options.cliCommand);
+    }
     // options.cliCommand
     //     .command('github')
     //     .description('Github')

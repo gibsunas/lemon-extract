@@ -1,5 +1,5 @@
 import { LemonContext } from '@lemon/extract/core/types/lemonContext';
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from '@lemon/extract/core/db';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import { ProjectConfig } from '../../repos';
@@ -20,9 +20,7 @@ type SafeScanActions = {
     // fetchFile: (filePathRelativeToRoot: string) => Promise<string>
 };
 
-type NodeScanActions = {
-    // getPackageJson: () => Promise<string | undefined>,
-};
+type NodeScanActions = Record<string, never>;
 type RepoScanActions = Partial<DefaultScanActions & SafeScanActions>;
 export interface ScanPluginActions {
     repo: RepoScanActions,
@@ -31,10 +29,18 @@ export interface ScanPluginActions {
 
 export type ScanActions = Partial<ScanPluginActions>;
 
-const prisma = new PrismaClient();
 const main = async (lemonContext: LemonContext) => {
     const debug = lemonContext.utils.debug.extend(name);
     debug('main');
+    // The database is optional for every other command (and for the MCP
+    // surface), so it is opened here rather than at module load. Importing
+    // this plugin used to construct a PrismaClient, which made `--help` and
+    // the MCP server require a reachable DATABASE_URL.
+    const prisma = await getPrisma();
+    if (!prisma) {
+        debug('no database configured (DATABASE_URL unset); skipping scan persistence');
+        return lemonContext;
+    }
     // const localContext = await bootstrap(lemonContext);
 
     Promise.all(
@@ -110,7 +116,7 @@ const main = async (lemonContext: LemonContext) => {
                     // debug(projectConfig.metadata.arborist.valueOf());
 
                     const arborist = projectConfig.metadata.arborist.valueOf() as any;
-                    // eslint-disable-next-line dot-notation
+                     
                     const arboristChildren = Array.from(arborist['children']);
                     const updatedState = await prisma.lemonExtractProjectState.update({
                         data: {

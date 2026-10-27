@@ -1,3 +1,3 @@
-describe("Hello", () => {
-    it("World", () => { expect(true).toEqual(true) })
-})
+describe('Hello', () => {
+    it('World', () => { expect(true).toEqual(true); });
+});
