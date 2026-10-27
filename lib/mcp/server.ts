@@ -62,32 +62,46 @@ type Tool = {
  * Context
  * ---------------------------------------------------------------------- */
 
-let contextPromise: Promise<LemonContext> | null = null;
-let githubError: string | null = null;
+/** One context per root directory: the caller names the project it means. */
+const contexts = new Map<string, Promise<LemonContext>>();
+const githubErrors = new Map<string, string>();
 
-const buildContext = async (): Promise<LemonContext> => {
-    const rootDir = process.env.LEMON_ROOT_DIR || process.cwd();
+const rootFromArgs = (args: Record<string, unknown>): string => {
+    const supplied = typeof args.rootDir === 'string' ? args.rootDir.trim() : '';
+    if (supplied) { return resolve(supplied); }
+    return resolve(process.env.LEMON_ROOT_DIR || process.cwd());
+};
+
+const buildContext = async (rootDir: string): Promise<LemonContext> => {
     const context = await getConfig(initNewContext({ rootDir }));
     try {
         context.github = await createGithubContext();
-        githubError = null;
+        githubErrors.delete(rootDir);
     } catch (error) {
         context.github = undefined;
-        githubError = (error as Error).message;
+        githubErrors.set(rootDir, (error as Error).message);
     }
     return context;
 };
 
-const getContext = (): Promise<LemonContext> => {
-    if (!contextPromise) { contextPromise = buildContext(); }
-    return contextPromise;
+const getContext = (rootDir: string): Promise<LemonContext> => {
+    const cached = contexts.get(rootDir);
+    if (cached) { return cached; }
+    const built = buildContext(rootDir);
+    contexts.set(rootDir, built);
+    return built;
 };
 
 const requireGithub = async (context: LemonContext) => {
     if (!context.github) {
-        throw new Error(githubError ?? 'No GitHub context: no credential was supplied.');
+        throw new Error(githubErrors.get(context.rootDir) ?? 'No GitHub context: no credential was supplied.');
     }
     return context.github;
+};
+
+const rootDirSchema = {
+    type: 'string',
+    description: 'Absolute path of the project root holding .lemon-extract.json. Defaults to LEMON_ROOT_DIR, then the working directory.'
 };
 
 /* -------------------------------------------------------------------------
@@ -97,10 +111,14 @@ const requireGithub = async (context: LemonContext) => {
 const tools: Tool[] = [
     {
         name: 'lemon.config',
-        description: 'Resolved lemon-extract configuration for this root: org/context repo and the declared projects. Read-only; does not scan, fetch, or write.',
-        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-        handler: async () => {
-            const context = await getContext();
+        description: 'Resolved lemon-extract configuration for a project root: org/context repo and the declared projects. Read-only; does not scan, fetch, or write.',
+        inputSchema: {
+            type: 'object',
+            properties: { rootDir: rootDirSchema },
+            additionalProperties: false
+        },
+        handler: async (args) => {
+            const context = await getContext(rootFromArgs(args));
             return {
                 rootDir: context.rootDir,
                 configPath: resolve(join(context.rootDir, '.lemon-extract.json')),
@@ -114,16 +132,20 @@ const tools: Tool[] = [
                 })),
                 github: context.github
                     ? { available: true, login: context.github.viewer.login, readOnly: context.github.capabilities.readOnly }
-                    : { available: false, reason: githubError }
+                    : { available: false, reason: githubErrors.get(context.rootDir) ?? null }
             };
         }
     },
     {
         name: 'github.viewer',
         description: 'The authenticated GitHub identity (viewer query) plus what the presented token is allowed to do. Reads the credential from the environment; never returns it.',
-        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-        handler: async () => {
-            const context = await getContext();
+        inputSchema: {
+            type: 'object',
+            properties: { rootDir: rootDirSchema },
+            additionalProperties: false
+        },
+        handler: async (args) => {
+            const context = await getContext(rootFromArgs(args));
             const { viewer, capabilities, rateLimit, fetchedAt } = await requireGithub(context);
             return {
                 login: viewer.login,
@@ -141,17 +163,18 @@ const tools: Tool[] = [
     },
     {
         name: 'github.repository.projects',
-        description: 'Project boards for a repository (defaults to the configured organization/contextRepo). Read-only GraphQL query.',
+        description: 'Project boards for a repository (defaults to the organization/contextRepo configured for the given root). Read-only GraphQL query.',
         inputSchema: {
             type: 'object',
             properties: {
                 owner: { type: 'string', description: 'Repository owner; defaults to the configured organization.' },
-                name: { type: 'string', description: 'Repository name; defaults to the configured contextRepo.' }
+                name: { type: 'string', description: 'Repository name; defaults to the configured contextRepo.' },
+                rootDir: rootDirSchema
             },
             additionalProperties: false
         },
         handler: async (args) => {
-            const context = await getContext();
+            const context = await getContext(rootFromArgs(args));
             await requireGithub(context);
             const owner = typeof args.owner === 'string' && args.owner
                 ? args.owner

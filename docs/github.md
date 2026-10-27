@@ -79,6 +79,11 @@ loopback HTTP endpoint and registers it as `adhd.project.lemon-extract.call`.
 | `github.viewer` | GraphQL viewer + `GET /user` scopes | no |
 | `github.repository.projects` | GraphQL `projectsV2` | no |
 
+Each takes an optional `rootDir` argument (defaults to `LEMON_ROOT_DIR`, then
+the working directory), so one bridge serves every project root the caller
+names. Contexts are cached per root for the life of the process; a credential
+change needs a restart, not a retry.
+
 Deliberately **not** exposed: `scan` (writes to Postgres), `npm` (arborist tree
 building), `git` (spawns `git`). They mutate state or execute commands, and the
 bridge contract is read-only tools only. Exposing them would need its own
@@ -100,7 +105,8 @@ request_timeout: 30s
 ```
 
 The command is static config, never a request field. The child gets a minimal
-environment allow-list plus the one secret the config names.
+environment allow-list plus the one secret the config names, resolved by lezz at
+spawn time from the same Keychain item `lezz auth github` wrote.
 
 ## Limits
 
