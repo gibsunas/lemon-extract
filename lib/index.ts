@@ -147,23 +147,10 @@ const main = async () => {
     // Let's give the plugins a chance to alter the CLI dynamically
     await BootstrapLemonExtract({ cliCommand: program, processArgs: process.argv });
 
-    // program
-    //   .command('ts')
-    //   .description('Typescript review')
-    //   .action((options) => {
-    //         debug('Launching typescript review executor');
-    //         extract();
-    //       });
-    // program
-    //   .command('lint')
-    //   .description('Workspace linting')
-    //   .action((options) => {
-    //         debug('Launching workspace linting');
-    //         console.log(Nx(context));
-    //       });
-
     program.parse(process.argv);
 };
+
 export const cli = main;
+export { main };
+export { startMcpServer } from './mcp/server';
 export default { cli, main };
-main();

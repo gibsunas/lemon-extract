@@ -2,3 +2,7 @@ node_modules
 dist
 coverage/
 .env
+
+# Local editor/tooling
+.DS_Store
+*.tsbuildinfo

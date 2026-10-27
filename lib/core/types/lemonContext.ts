@@ -1,8 +1,7 @@
 import { LemonConfig } from '@lemon/extract/core/types/lemonConfig';
 import { Debugger } from 'debug';
-import type fetch from 'node-fetch';
 import { debug as Debug } from '../../utils/debug';
-// const fetch = require('node-fetch');
+import type { GithubContext } from '../../integrations/github/types';
 interface LemonContext {
     config: LemonConfig,
     commandOptions?: Record<string, string>,
@@ -10,9 +9,14 @@ interface LemonContext {
     cwd: string,
     rootDir: string,
     plugins: Map<string, any>,
+    /**
+     * GitHub identity + capability record (issue #6). Absent when no
+     * credential was supplied; never contains the token itself.
+     */
+    github?: GithubContext,
     utils: {
         debug: typeof Debugger
-        fetch?: typeof fetch
+        fetch?: typeof globalThis.fetch
     }
     flags: {
         isDryRun: boolean,

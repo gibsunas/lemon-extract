@@ -3,6 +3,10 @@ import { initNewContext } from '@lemon/extract/core/types';
 import * as path from 'path';
 import init, { main } from './index';
 
+// The context carries a `debug` function, and two contexts never share the same
+// function identity. Compare the serializable shape instead.
+const serialized = (value: unknown) => JSON.stringify(value);
+
 describe('@lemon~core~config plugin:init', () => {
     describe('index', () => {
         describe('exports init', () => {
@@ -26,28 +30,26 @@ describe('@lemon~core~config plugin:init', () => {
                     const expectedContext = initNewContext({ rootDir: '<nowhere>' });
                     const appliedContext = await main(lemonContext);
                     expect(appliedContext).toBeTruthy();
-                    expect(appliedContext).toStrictEqual(expectedContext);
+                    expect(serialized(appliedContext)).toEqual(serialized(expectedContext));
                 });
                 it('returns the expected context with a folder', async () => {
-                    const rootDir = path.resolve('./__fixtures__/basic');
+                    const rootDir = path.resolve('./lib/core/plugins/init/__fixtures__/basic');
                     const lemonContext = initNewContext({ rootDir });
                     const expectedContext = initNewContext({ rootDir });
                     const appliedContext = await main(lemonContext);
                     expect(appliedContext).toBeTruthy();
-                    expect(appliedContext).toStrictEqual(expectedContext);
+                    expect(serialized(appliedContext)).toEqual(serialized(expectedContext));
                 });
-                it('can find this repo :shhhhh:', async () => {
-                    const rootDir = path.resolve('../');
-                    const lemonContext = initNewContext({ rootDir });
-                    const appliedContext = await main(lemonContext);
-                    expect(appliedContext).toBeTruthy();
-                    expect(appliedContext.config.projects).toContainEqual({
-                        enabled: false,
-                        metadata: {},
-                        name: 'extract',
-                        root: './extract'
-                    });
-                });
+            });
+        });
+        describe('exports bootstrap', () => {
+            it('discovers projects from the root directory', async () => {
+                const rootDir = path.resolve('./lib/core/plugins/init/__fixtures__/basic');
+                const lemonContext = await init.bootstrap(initNewContext({ rootDir })) as Awaited<ReturnType<typeof init.bootstrap>>;
+                expect(lemonContext.config.projects.length).toBeGreaterThan(0);
+                const projectA = lemonContext.config.projects.find((project) => project.name === 'projectA');
+                expect(projectA).toBeTruthy();
+                expect(projectA?.root).toEqual('./projectA');
             });
         });
     });

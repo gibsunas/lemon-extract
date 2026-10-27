@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "composite": true,
-        "target": "ES2020",
+        "target": "ES2022",
         "rootDir": "lib/",
         "skipLibCheck": true,
         "sourceMap": true,
@@ -10,25 +10,18 @@
         "experimentalDecorators": true,
         "importHelpers": true,
         "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
         "tsBuildInfoFile": "dist/.tsbuildinfo",
-        "types": [ "node", "jest"],
-        "lib": [
-            "ESNext"
-        ],
+        "types": ["node", "jest"],
+        "lib": ["ES2022", "DOM"],
         "module": "ESNext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "baseUrl": ".",
         "outDir": "dist",
         "paths": {
-            "@lemon/extract/*": [
-                "./lib/*"
-            ]
+            "@lemon/extract/*": ["./lib/*"]
         }
     },
-    "include": [
-        "lib/**/*",
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+    "include": ["lib/**/*"],
+    "exclude": ["node_modules", "dist"]
 }

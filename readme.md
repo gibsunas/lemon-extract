@@ -25,9 +25,15 @@ Examples:
     -
 
 ## Dev
+
+Requires Node.js **>= 22.22.2** (the floor comes from `@npmcli/arborist`).
+
+The Prisma CLI's transitive `deepmerge-ts` is pinned through `overrides` to a
+release without the stack-exhaustion advisory; `npm audit` is clean.
+
 ```
 # Terminal A
-$ npm run webpack -- --watch
+$ npm run watch
 
 # Terminal B
 $ DEBUG=@lemon/extract:* npm run cli -- --help
@@ -38,6 +44,38 @@ $ DEBUG=@lemon/extract:* npm run cli -- --help
 The fastest way to utilize `@lemon/extract` is by running
 ```
 $ npx @lemon/extract
+```
+
+## GitHub access
+
+GitHub is authenticated with a token supplied by the caller — for this lab, the
+lezz stdio bridge resolves `lezz auth github`'s Keychain item and passes it in
+`LEMON_GITHUB_TOKEN`. lemon-extract never stores a credential and never reads
+`$GITHUB_TOKEN`.
+
+```sh
+$ LEMON_GITHUB_TOKEN=… lemon-extract github
+```
+
+Read [docs/github.md](docs/github.md) for the capability model (read-only is the
+default and cannot be overridden by a request) and the MCP surface.
+
+## MCP
+
+`lemon-extract-mcp` serves a read-only, tools-only MCP server over stdio:
+
+| Tool | Upstream |
+|---|---|
+| `lemon.config` | resolved `.lemon-extract.json` |
+| `github.viewer` | GraphQL viewer + token capabilities |
+| `github.repository.projects` | GraphQL `projectsV2` |
+
+It is meant to be wrapped by a supervisor (the lezz stdio bridge) that owns the
+process, the credential, and the loopback HTTP endpoint. Running it directly is
+fine for a probe:
+
+```sh
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | lemon-extract-mcp
 ```
 
 ## What the tool will do for you?

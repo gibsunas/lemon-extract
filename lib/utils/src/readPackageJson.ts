@@ -1,6 +1,5 @@
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 
-const { readJsonFile } = require('@nrwl/workspace');
 export type PackageJson = {
     name: string,
     license?: string,
@@ -16,7 +15,13 @@ export type PackageJson = {
 const readPackageJson = (path: string) => {
     const packagePath = `${path}/package.json`;
     if (!existsSync(packagePath)) { return {} as PackageJson; }
-    return readJsonFile(packagePath) as PackageJson;
+    try {
+        return JSON.parse(readFileSync(packagePath, 'utf-8')) as PackageJson;
+    } catch {
+        // A malformed package.json in a scanned project is data, not a crash:
+        // report it as empty so one bad project cannot abort the whole scan.
+        return {} as PackageJson;
+    }
 };
 
 export {

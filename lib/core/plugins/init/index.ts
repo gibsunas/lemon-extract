@@ -24,6 +24,9 @@ const main = async (lemonContext: LemonContext) => {
         writeFileSync(lemonContext.config.lemonRcPath, JSON.stringify(lemonConfig));
         return lemonContext;
     }
+    // No .lemon-extract.json to write yet: `init` is still a successful no-op
+    // and must return the context, like every other plugin main.
+    return lemonContext;
 };
 
 const bootstrap = async (lemonContext: LemonContext) => {
@@ -82,7 +85,7 @@ const bootstrap = async (lemonContext: LemonContext) => {
                 @lemon/extract:core:plugins:git Finished +0ms
             */
 
-            const isContextManagementRepo = dir === lemonContext.config.contextRepo ?? undefined;
+            const isContextManagementRepo = dir === lemonContext.config.contextRepo;
             const rootDir = `./${dir}`;
             const matchingProjects = lemonContext.config.projects
                 .filter((p) => p.root === rootDir);
