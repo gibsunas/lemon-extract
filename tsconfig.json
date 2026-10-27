@@ -12,16 +12,30 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "tsBuildInfoFile": "dist/.tsbuildinfo",
-        "types": ["node", "jest"],
-        "lib": ["ES2022", "DOM"],
+        "types": [
+            "node",
+            "jest"
+        ],
+        "lib": [
+            "ES2022",
+            "DOM"
+        ],
         "module": "ESNext",
         "moduleResolution": "bundler",
         "baseUrl": ".",
         "outDir": "dist",
         "paths": {
-            "@lemon/extract/*": ["./lib/*"]
+            "@lemon/extract/*": [
+                "./lib/*"
+            ]
         }
     },
-    "include": ["lib/**/*"],
-    "exclude": ["node_modules", "dist"]
+    "include": [
+        "lib/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "**/*.test.ts"
+    ]
 }

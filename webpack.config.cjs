@@ -19,7 +19,9 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
-                exclude: /node_modules/
+                // Tests are type-checked by jest/ts-jest, not by the bundle.
+                // Compiling them here would ship .test.d.ts in the tarball.
+                exclude: [/node_modules/, /\.test\.ts$/]
             }
         ]
     },

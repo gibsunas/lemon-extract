@@ -26,8 +26,7 @@ export default {
         '^.+\\.(ts|tsx)$': ['ts-jest', {
             tsconfig: {
                 module: 'CommonJS',
-                moduleResolution: 'node',
-                isolatedModules: true
+                moduleResolution: 'node'
             }
         }]
     },
